@@ -14,6 +14,7 @@ namespace SmarterScheduling
         public override void MapComponentTick()
         {
             base.MapComponentTick();
+            // WOW that is FAST lets slow it down a little.
             Log.Message("Hello, world!");
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {

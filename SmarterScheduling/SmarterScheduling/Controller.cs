@@ -20,7 +20,6 @@ namespace SmarterScheduling
         {
             base.DefsLoaded();
             WorldObject_Brain.OnDefsLoaded();
-            //WorldObject_Priorities.OnDefsLoaded();
         }
 
         public new static ModLogger Logger => _logger;
@@ -29,8 +28,10 @@ namespace SmarterScheduling
         {
             base.MapLoaded(map);
 
-            // make sure each loaded map has our timekeeper component
-            // this will inject the component into existing save games.
+            // Fluffy did this. I don't know what it is.
+            // I'll leave it commented here for now in case I need it.
+            // Holy crap I have no idea what I'm doing please send help.
+
             //if (map.GetComponent<MapComponent_Timekeeper>() == null)
                 //map.components.Add(new MapComponent_Timekeeper(map));
         }
