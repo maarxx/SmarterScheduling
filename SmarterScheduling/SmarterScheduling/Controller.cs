@@ -18,8 +18,6 @@ namespace SmarterScheduling
 
         public Controller() : base() { _logger = base.Logger; }
 
-        public override void Tick(int currentTick)
-
         /*
         public override void DefsLoaded()
         {
