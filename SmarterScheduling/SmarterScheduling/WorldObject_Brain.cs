@@ -5,7 +5,6 @@ using System.Text;
 
 namespace SmarterScheduling
 {
-    /*
     class WorldObject_Brain : UtilityWorldObject
     {
         public static void OnDefsLoaded()
@@ -13,5 +12,4 @@ namespace SmarterScheduling
             //throw new NotImplementedException();
         }
     }
-    */
 }
