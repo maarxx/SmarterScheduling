@@ -30,14 +30,14 @@ namespace SmarterScheduling
                 slowDown = 0;
             }
 
-            Log.Message("Hello, slow! MapID:" + map.uniqueID + ", ColonistCount:" + map.mapPawns.FreeColonistsSpawnedCount);
+            Log.Message("Hello, SLOW! MapID:" + map.uniqueID + ", ColonistCount:" + map.mapPawns.FreeColonistsSpawnedCount);
             // OKAY that should be better.
 
-            /*
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
+                //p.jobs.StopAll();
+                // Okay that did exactly as expected, we'll need that later.
             }
-            */
         }
     }
 }
