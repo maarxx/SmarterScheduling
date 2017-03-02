@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Verse;
@@ -37,6 +38,12 @@ namespace SmarterScheduling
             {
                 //p.jobs.StopAll();
                 // Okay that did exactly as expected, we'll need that later.
+                int i = 0;
+                foreach (TimeAssignmentDef tad in p.timetable.times)
+                {
+                    Log.Message("Pawn: " + p.NameStringShort + ", " + i + ", " + tad.allowJoy + ", " + tad.allowRest);
+                    i++;
+                }
             }
         }
     }
