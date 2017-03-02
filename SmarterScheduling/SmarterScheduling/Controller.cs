@@ -14,16 +14,19 @@ namespace SmarterScheduling
 
         private static ModLogger _logger;
 
+        public new static ModLogger Logger => _logger;
+
         public Controller() : base() { _logger = base.Logger; }
 
+        /*
         public override void DefsLoaded()
         {
             base.DefsLoaded();
             WorldObject_Brain.OnDefsLoaded();
         }
+        */
 
-        public new static ModLogger Logger => _logger;
-
+        /*
         public override void MapLoaded(Map map)
         {
             base.MapLoaded(map);
@@ -35,5 +38,6 @@ namespace SmarterScheduling
             //if (map.GetComponent<MapComponent_Timekeeper>() == null)
                 //map.components.Add(new MapComponent_Timekeeper(map));
         }
+        */
     }
 }

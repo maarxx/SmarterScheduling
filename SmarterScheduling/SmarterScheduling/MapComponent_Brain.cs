@@ -17,7 +17,7 @@ namespace SmarterScheduling
         {
             base.MapComponentTick();
 
-            Log.Message("Hello, FAST!");
+            //Log.Message("Hello, FAST!");
             // WOW that is FAST lets slow it down a little.
 
             slowDown++;
@@ -30,7 +30,7 @@ namespace SmarterScheduling
                 slowDown = 0;
             }
 
-            Log.Message("Hello, SLOW!");
+            Log.Message("Hello, slow! MapID:" + map.uniqueID + ", ColonistCount:" + map.mapPawns.FreeColonistsSpawnedCount);
             // OKAY that should be better.
 
             /*
