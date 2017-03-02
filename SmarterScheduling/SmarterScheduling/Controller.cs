@@ -18,11 +18,8 @@ namespace SmarterScheduling
 
         public Controller() : base() { _logger = base.Logger; }
 
-<<<<<<< HEAD
-        public new static ModLogger Logger => _logger;
-
         public override void Tick(int currentTick)
-=======
+
         /*
         public override void DefsLoaded()
         {
@@ -33,7 +30,6 @@ namespace SmarterScheduling
 
         /*
         public override void MapLoaded(Map map)
->>>>>>> Rollback
         {
             Log.Message("Hello, world!");
         }
