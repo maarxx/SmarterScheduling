@@ -52,7 +52,7 @@ If you Delete or Rename this Area, the mod will just recreate another one named 
 
 If, for some totally bizarre reason, you have an Animal Area named "Psyche", this mod will rename your Animal Area to "Psyche2", freeing up "Psyche" for its own purposes.
 
-And if you are at your maximum Areas, and this mod cannot create "Psyche", it will probably throw an error or something, I dunno. So make room for it.
+And if you are at your maximum Areas, and this mod cannot create "Psyche", it will probably blow up with a stack trace error or something, and might set all your muffalo on fire. I dunno. I honestly didn't test. So just make room for it.
 
 Expand the "Psyche" Area to identify your Dining Room / Recreation Room. It should have Food, and Chairs, and sources of Joy, and good Beauty / Comfort / Space scores.
 
