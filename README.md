@@ -87,7 +87,7 @@ If you want to tweak the balancing, the values are all found at the very top of 
 * REST_THRESH_LOW - the threshold at which your Pawn should go to sleep. You might want to tweak this, to get them to go to bed earlier or stay awake longer.
 * REST_THRESH_HIGH - a threshold that is used to determine that a Pawn is well rested, and having just woken up. I really, really don't think you want to tweak this, but maybe there's a bug here, I dunno.
 
-* MOOD_THRESH_HIGH - after waking up or otherwise being sent to Psyche, your Pawn will remain there UNTIL HIS MOOD STOPS INCREASING **AND** UNTIL HIS MOOD IS OVER THIS TARGET THRESHOLD. This is the most likely value that you will want to tweak.
+* MOOD_THRESH_HIGH - after waking up or otherwise being sent to Psyche, your Pawn will remain in Psyche, at minimum, until his overall Mood is above this threshold. This is the most likely value that you'll want to tweak. Note that, in many cases, your Pawn will remain in Psyche for a bit longer than this, keep reading.
 
 * JOY_THRESH_HIGH - similarly to REST_THRESH_HIGH, this is a threshold used to determine that a Pawn has finished Joying. You probably don't want to tweak this value. He will remain in Psyche longer than this, continue reading for the explanation.
 
