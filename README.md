@@ -26,7 +26,7 @@ This is exactly what you are trying to acheive with that clunky little Scheduler
 
 But the tool just isn't up to the task. What you want is just a little too complicated, and you can't ever quite get it right.
 
-You try to find the right balance, but it's just not the right tool for the job, and whenever your balance is a bit off, your prize Doctor goes berserk and gets his arm blown off.
+You try to find the right balance, but it's just not the right tool for the job, and whenever your balance is a bit off, your prize Doctor goes berserk and gets his arm blown off by your Sniper.
 
 ## Enter Smarter Scheduling
 
