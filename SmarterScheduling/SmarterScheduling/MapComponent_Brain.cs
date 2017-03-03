@@ -18,8 +18,8 @@ namespace SmarterScheduling
 
         public Dictionary<Pawn, PawnState> pawnStates;
 
-        public const float MOOD_THRESH_LOW =  0.35F ;
-        public const float MOOD_THRESH_HIGH = 0.80F ;
+        public const float MOOD_THRESH_LOW =  0.20F ;
+        public const float MOOD_THRESH_HIGH = 0.40F ;
 
         public const float REST_THRESH_LOW =  0.28F ;
         public const float REST_THRESH_HIGH = 0.95F ;
