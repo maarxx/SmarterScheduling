@@ -82,7 +82,7 @@ namespace SmarterScheduling
                     lastPawnAreas.Add(p, null);
                 }
                 Area curPawnArea = p.playerSettings.AreaRestriction;
-                if (curPawnArea != null && curPawnArea != psyche)
+                if (curPawnArea == null || curPawnArea != psyche)
                 {
                     lastPawnAreas[p] = curPawnArea;
                 }
