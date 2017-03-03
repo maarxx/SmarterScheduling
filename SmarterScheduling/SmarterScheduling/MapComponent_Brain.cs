@@ -131,8 +131,19 @@ namespace SmarterScheduling
 
         public override void MapComponentTick()
         {
+            slowDown++;
+            if (slowDown < 100)
+            {
+                return;
+            }
+            else
+            {
+                slowDown = 0;
+            }
+
             initPsycheArea();
             initPawnsIntoCollection();
+
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
                 if (p.needs.rest.CurLevel < REST_THRESH_LOW)
@@ -178,149 +189,5 @@ namespace SmarterScheduling
             }
         }
 
-
-
-
-        public static void blockPawnSchedule(Pawn p, TimeAssignmentDef tad)
-        {
-            for (int i = 0; i < 24; i++)
-            {
-                p.timetable.SetAssignment(i, tad);
-            }
-        }
-
-        //public override void MapComponentTick()
-        public void old_MapComponentTick()
-        {
-            //base.MapComponentTick();
-
-            // This method ticks REALLY fast, no need for this fast. SLOW DOWN by 100.
-            this.slowDown++;
-            if (this.slowDown < 100)
-            {
-                return;
-            }
-            else
-            {
-                this.slowDown = 0;
-            }
-
-            Log.Message("Hello, slow!");
-
-            // Find the Psyche area.
-            foreach (Area a in map.areaManager.AllAreas)
-            {
-                if (a.ToString() == PSYCHE_NAME)
-                {
-                    this.psyche = a;
-                    break;
-                }
-                this.psyche = null;
-            }
-
-            //String pawnName;
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
-            {
-                //pawnName = p.NameStringShort;
-
-                //p.jobs.StopAll();
-                // Okay that did exactly as expected, we'll need that later.
-
-                /*
-                //Print the Pawn's current Area (debug / testing).
-                if (p.playerSettings.AreaRestriction != null)
-                {
-                    Log.Message(p.NameStringShort + " , " + p.playerSettings.AreaRestriction.ToString());
-                }
-                else
-                {
-                    Log.Message(p.NameStringShort + " , null area");
-                }
-                */
-
-                // Make note of all Pawn's previously assigned Areas, to restore them later.
-                Area curArea = p.playerSettings.AreaRestriction;
-                if (curArea == null || curArea != this.psyche)
-                {
-                    //Log.Message("Saved Area: " + curArea.ToString() + " for Pawn: " + pawnName);
-                    //lastAreas.Add(p, curArea);
-                    lastAreas[p] = curArea;
-                }
-
-                // If overall Mood is tanked
-                if (p.needs.mood.CurLevel < MOOD_THRESH)
-                {
-                    //Log.Message("Pawn :" + pawnName + " is critical Mood.");
-                    if (this.psyche != null)
-                    {
-                        //Log.Message("Pawn: " + pawnName + " restricted to " + PSYCHE_NAME);
-                        p.playerSettings.AreaRestriction = this.psyche;
-                    }
-                }
-                // Mood isn't tanked
-                else
-                {
-                    //Log.Message("Pawn :" + pawnName + " is non-critical Mood.");
-                    // but might just be recovering
-                    if (p.needs.mood.GUIChangeArrow > 0)
-                    {
-                        // Do nothing.
-                    }
-                    // Mood isn't tanked, Mood isn't recovering
-                    else
-                    {
-                        // If in Psyche, release from Psyche
-                        if (p.playerSettings.AreaRestriction == this.psyche)
-                        {
-                            Area result;
-                            if (lastAreas.TryGetValue(p, out result))
-                            {
-                                p.playerSettings.AreaRestriction = result;
-                            }
-                            else
-                            {
-                                p.playerSettings.AreaRestriction = null;
-                            }
-                        }
-                    }
-                }
-
-                // Rest or Joy is improving already
-                if (p.needs.rest.GUIChangeArrow > 0 || p.needs.joy.GUIChangeArrow > 0)
-                {
-                    // Keep doing whatever the hell you are doing, buddy
-                    blockPawnSchedule(p, TimeAssignmentDefOf.Anything);
-                }
-                // Rest or Joy isn't improving already
-                else
-                {
-                    // If Rest is below threshold
-                    if (p.needs.rest.CurLevel < REST_THRESH)// || p.CurJob.def.reportString == "lying down.")
-                    {
-                        // go to Sleep
-                        blockPawnSchedule(p, TimeAssignmentDefOf.Sleep);
-                    }
-                    else
-                    {
-                        // If Mood is 
-                        if (p.needs.mood.CurLevel < MOOD_THRESH)
-                        {
-                            blockPawnSchedule(p, TimeAssignmentDefOf.Joy);
-                        }
-                        else
-                        {
-                            if (p.needs.joy.CurLevel < JOY_THRESH)
-                            {
-                                blockPawnSchedule(p, TimeAssignmentDefOf.Joy);
-                            }
-                            else
-                            {
-                                blockPawnSchedule(p, TimeAssignmentDefOf.Work);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
