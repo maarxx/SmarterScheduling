@@ -18,8 +18,11 @@ namespace SmarterScheduling
 
         public Dictionary<Pawn, PawnState> pawnStates;
 
-        public const float MOOD_THRESH_LOW  = 0.25F ;
-        public const float MOOD_THRESH_HIGH = 0.52F ;
+        // Now defined per-pawn, please CTRL+F search for the same variable name.
+        // Can be found further down in this same file.
+
+        //public const float MOOD_THRESH_LOW  = 0.25F ;
+        //public const float MOOD_THRESH_HIGH = 0.52F ;
 
         public const float REST_THRESH_LOW  = 0.35F ;
         public const float REST_THRESH_HIGH = 0.90F ;
@@ -147,6 +150,9 @@ namespace SmarterScheduling
 
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
+                float MOOD_THRESH_LOW = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02F;
+                float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
+
                 if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                 {
                     setPawnState(p, PawnState.SLEEP);
