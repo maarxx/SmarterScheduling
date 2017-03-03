@@ -18,7 +18,7 @@ You wanted them to stay until their overall Mood had caught up with the awesome 
 
 Then you want them to go Work for a while, ideally continuously until they have to Sleep. And then repeat the process.
 
-And if, while they're out, their overall Mood hits a critically low threshold, you want them to go back to your awesome Dining / Recreation room, and stay there, until their overall MOOD improves, not just until their JOY improves.
+And if, while they're out, their Joy or overall Mood hits a critically low threshold, you want them to go back to your awesome Dining / Recreation room, and stay there, *not* just until thier *Joy* is full, but until their *overall Mood* has peaked.
 
 ## The concept is simple, but this is difficult to execute in vanilla.
 
