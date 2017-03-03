@@ -96,7 +96,7 @@ If you want to tweak the balancing, the values are all found at the very top of 
 
 Your Pawn can be sent to Psyche for any of these three reasons:
 
-1. Having just woken up from Sleep.
+1. Having just woken up from a complete and restful Sleep.
 2. Having an overall Mood dropped below the threshold.
 3. Having a Joy dropped below the threshold.
 
