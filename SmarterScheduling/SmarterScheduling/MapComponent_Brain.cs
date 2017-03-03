@@ -18,13 +18,14 @@ namespace SmarterScheduling
 
         public Dictionary<Pawn, PawnState> pawnStates;
 
-        public const float MOOD_THRESH_LOW =  0.20F ;
+        public const float MOOD_THRESH_LOW  = 0.20F ;
         public const float MOOD_THRESH_HIGH = 0.40F ;
 
-        public const float REST_THRESH_LOW =  0.28F ;
-        public const float REST_THRESH_HIGH = 0.95F ;
+        public const float REST_THRESH_LOW  = 0.28F ;
+        public const float REST_THRESH_HIGH = 0.90F ;
 
-        public const float JOY_THRESH_LOW =   0.28F ;
+        public const float JOY_THRESH_LOW   = 0.28F ;
+        public const float JOY_THRESH_HIGH  = 0.90F ;
 
         public const string PSYCHE_NAME = "Psyche";
 
@@ -162,6 +163,11 @@ namespace SmarterScheduling
                     continue;
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
+                {
+                    //setPawnState(p, PawnState.JOY);
+                    continue;
+                }
+                else if (pawnStates[p] == PawnState.JOY && p.needs.joy.CurLevel < JOY_THRESH_HIGH)
                 {
                     //setPawnState(p, PawnState.JOY);
                     continue;
