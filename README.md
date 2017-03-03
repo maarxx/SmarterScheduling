@@ -1,5 +1,7 @@
 # SmarterScheduling
 
+This is a mod for the game RimWorld by Ludeon Studios.
+
 ## Okay, let's be honest. We all want the same thing.
 
 You know exactly how you want your Pawns to behave. We all want roughly the same thing.
