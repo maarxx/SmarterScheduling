@@ -30,7 +30,7 @@ namespace SmarterScheduling
         public const float JOY_THRESH_LOW    = 0.28F ;
         public const float JOY_THRESH_HIGH   = 0.90F ;
 
-        public const float HUNGER_THRESH_LOW = 0.30F ;
+        public const float HUNGER_THRESH_LOW = 0.25F ;
 
         public const string PSYCHE_NAME = "Psyche";
 
@@ -118,13 +118,25 @@ namespace SmarterScheduling
                 p.timetable.SetAssignment(i, newTad);
             }
 
-            if (state == PawnState.JOY && p.needs.food.CurLevel < HUNGER_THRESH_LOW)
+            if (state == PawnState.JOY && p.needs.food.CurLevel > HUNGER_THRESH_LOW)
             {
                 p.playerSettings.AreaRestriction = psyche;
             }
             else
             {
                 p.playerSettings.AreaRestriction = lastPawnAreas[p];
+            }
+
+            if (
+                state == PawnState.JOY
+                && p.CurJob.def.reportString == "lying down."
+                && !(p.needs.rest.GUIChangeArrow > 0)
+                && !p.health.HasHediffsNeedingTendByColony()
+                && p.health.capacities.CanBeAwake
+                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
+                )
+            {
+                p.jobs.StopAll(false);
             }
         }
 
@@ -139,7 +151,6 @@ namespace SmarterScheduling
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
-                Log.Message("PAWN: " + p.NameStringShort);
                 if (p.health.HasHediffsNeedingTendByColony())
                 {
                     return true;
@@ -219,17 +230,17 @@ namespace SmarterScheduling
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
                 {
-                    //setPawnState(p, PawnState.JOY);
+                    setPawnState(p, PawnState.JOY);
                     continue;
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.joy.CurLevel < JOY_THRESH_HIGH)
                 {
-                    //setPawnState(p, PawnState.JOY);
+                    setPawnState(p, PawnState.JOY);
                     continue;
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.GUIChangeArrow > 0)
                 {
-                    //setPawnState(p, PawnState.JOY);
+                    setPawnState(p, PawnState.JOY);
                     continue;
                 }
                 else if (p.needs.mood.CurLevel < MOOD_THRESH_LOW)
