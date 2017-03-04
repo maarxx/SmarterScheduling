@@ -133,6 +133,44 @@ namespace SmarterScheduling
         }
         */
 
+        public bool doesAnyoneNeedTreatment()
+        {
+            foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
+            {
+                Log.Message("PAWN: " + p.NameStringShort);
+                if (p.health.HasHediffsNeedingTendByColony())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // If "treatment" is anywhere in your top 15 WorkGivers, you're a doctor.
+        // Otherwise, you're not a doctor.
+        public bool isPawnDoctor(Pawn p)
+        {
+            int i = 0;
+            foreach (WorkGiver wg in p.workSettings.WorkGiversInOrderNormal)
+            {
+                String workGiverString = wg.def.verb + "," + wg.def.priorityInType;
+                if (workGiverString == "treat,100")
+                {
+                    return true;
+                }
+                else if (workGiverString == "treat,70")
+                {
+                    return true;
+                }
+                if (i > 15)
+                {
+                    return false;
+                }
+                i++;
+            }
+            return false;
+        }
+
         public override void MapComponentTick()
         {
             slowDown++;
@@ -148,10 +186,19 @@ namespace SmarterScheduling
             initPsycheArea();
             initPawnsIntoCollection();
 
+            bool anyoneNeedTreatment = doesAnyoneNeedTreatment();
+
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
                 float MOOD_THRESH_LOW = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02F;
                 float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
+
+                bool areDoctor = isPawnDoctor(p);
+                if (anyoneNeedTreatment && areDoctor)
+                {
+                    setPawnState(p, PawnState.WORK);
+                    continue;
+                }
 
                 if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                 {
