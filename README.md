@@ -2,7 +2,21 @@
 
 This is a mod for the game RimWorld by Ludeon Studios.
 
-## Okay, let's be honest. We all want the same thing.
+#### Note for return visitors:
+
+If you think you've found a bug or want to request a feature:
+
+Check out the "Issues" tab for [Open/Known Issues](https://github.com/maarxx/SmarterScheduling/issues?q=is%3Aopen+is%3Aissue) and [Closed/Fixed Issues](https://github.com/maarxx/SmarterScheduling/issues?q=is%3Aissue+is%3Aclosed).
+
+Not every recently fixed issue is available in the [Master Branch](https://github.com/maarxx/SmarterScheduling). If an issue was fixed very recently, it might only be available in the [Beta Branch](https://github.com/maarxx/SmarterScheduling/tree/beta).
+
+So if you think you've found a bug, but it is already listed as fixed, or if you just want to try out the newest features before everyone else, consider trying the Beta Branch version of the mod!
+
+If you still think you have a bug that isn't already covered by the above, please feel free to create a new issue!
+
+# Introduction and Explanation
+
+## Let's be honest. We all want the same thing.
 
 You know exactly how you want your Pawns to behave. We all want roughly the same thing.
 
