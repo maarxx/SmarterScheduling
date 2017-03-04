@@ -18,14 +18,19 @@ namespace SmarterScheduling
 
         public Dictionary<Pawn, PawnState> pawnStates;
 
-        public const float MOOD_THRESH_LOW  = 0.25F ;
-        public const float MOOD_THRESH_HIGH = 0.52F ;
+        // Now defined per-pawn, please CTRL+F search for the same variable name.
+        // Can be found further down in this same file.
 
-        public const float REST_THRESH_LOW  = 0.35F ;
-        public const float REST_THRESH_HIGH = 0.90F ;
+        //public const float MOOD_THRESH_LOW  = 0.25F ;
+        //public const float MOOD_THRESH_HIGH = 0.52F ;
 
-        public const float JOY_THRESH_LOW   = 0.28F ;
-        public const float JOY_THRESH_HIGH  = 0.90F ;
+        public const float REST_THRESH_LOW   = 0.35F ;
+        public const float REST_THRESH_HIGH  = 0.90F ;
+
+        public const float JOY_THRESH_LOW    = 0.28F ;
+        public const float JOY_THRESH_HIGH   = 0.90F ;
+
+        public const float HUNGER_THRESH_LOW = 0.25F ;
 
         public const string PSYCHE_NAME = "Psyche";
 
@@ -113,13 +118,25 @@ namespace SmarterScheduling
                 p.timetable.SetAssignment(i, newTad);
             }
 
-            if (state == PawnState.JOY)
+            if (state == PawnState.JOY && p.needs.food.CurLevel > HUNGER_THRESH_LOW)
             {
                 p.playerSettings.AreaRestriction = psyche;
             }
             else
             {
                 p.playerSettings.AreaRestriction = lastPawnAreas[p];
+            }
+
+            if (
+                state == PawnState.JOY
+                && p.CurJob.def.reportString == "lying down."
+                && !(p.needs.rest.GUIChangeArrow > 0)
+                && !p.health.HasHediffsNeedingTendByColony()
+                && p.health.capacities.CanBeAwake
+                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
+                )
+            {
+                p.jobs.StopAll(false);
             }
         }
 
@@ -129,6 +146,43 @@ namespace SmarterScheduling
             return pawnStates[p];
         }
         */
+
+        public bool doesAnyoneNeedTreatment()
+        {
+            foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
+            {
+                if (p.health.HasHediffsNeedingTendByColony())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // If "treatment" is anywhere in your top 15 WorkGivers, you're a doctor.
+        // Otherwise, you're not a doctor.
+        public bool isPawnDoctor(Pawn p)
+        {
+            int i = 0;
+            foreach (WorkGiver wg in p.workSettings.WorkGiversInOrderNormal)
+            {
+                String workGiverString = wg.def.verb + "," + wg.def.priorityInType;
+                if (workGiverString == "treat,100")
+                {
+                    return true;
+                }
+                else if (workGiverString == "treat,70")
+                {
+                    return true;
+                }
+                if (i > 15)
+                {
+                    return false;
+                }
+                i++;
+            }
+            return false;
+        }
 
         public override void MapComponentTick()
         {
@@ -145,8 +199,20 @@ namespace SmarterScheduling
             initPsycheArea();
             initPawnsIntoCollection();
 
+            bool anyoneNeedTreatment = doesAnyoneNeedTreatment();
+
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
+                float MOOD_THRESH_LOW = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02F;
+                float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
+
+                bool areDoctor = isPawnDoctor(p);
+                if (anyoneNeedTreatment && areDoctor)
+                {
+                    setPawnState(p, PawnState.WORK);
+                    continue;
+                }
+
                 if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                 {
                     setPawnState(p, PawnState.SLEEP);
@@ -164,17 +230,17 @@ namespace SmarterScheduling
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
                 {
-                    //setPawnState(p, PawnState.JOY);
+                    setPawnState(p, PawnState.JOY);
                     continue;
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.joy.CurLevel < JOY_THRESH_HIGH)
                 {
-                    //setPawnState(p, PawnState.JOY);
+                    setPawnState(p, PawnState.JOY);
                     continue;
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.GUIChangeArrow > 0)
                 {
-                    //setPawnState(p, PawnState.JOY);
+                    setPawnState(p, PawnState.JOY);
                     continue;
                 }
                 else if (p.needs.mood.CurLevel < MOOD_THRESH_LOW)
