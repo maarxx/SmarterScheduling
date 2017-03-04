@@ -95,7 +95,7 @@ If you want to tweak the balancing, the values are all found at the very top of 
 * MOOD_THRESH_LOW - your Pawn will be prematurely sent back to Psyche if his overall Mood drops below this threshold.
 * JOY_THRESH_LOW - your Pawn will be prematurely sent back to Psyche if his Joy drops below this threshold.
 
-UPDATE: MOOD_THRESH_LOW (and, less relevantly, MOOD_THRESH_HIGH) are now dynamic for each Pawn based upon their Major Break (and, less relevantly, Minor Break) thresholds. Thier new definitions are further down in the code. There is still a +BUFFER added to them, which you might want to tweak.
+> UPDATE: MOOD_THRESH_LOW (and, less relevantly, MOOD_THRESH_HIGH) are now dynamic for each Pawn based upon their Major Break (and, less relevantly, Minor Break) thresholds. Thier new definitions are further down in the code. There is still a +BUFFER added to them, which you might want to tweak.
 
 Your Pawn can be sent to Psyche for any of these three reasons:
 
