@@ -134,6 +134,7 @@ namespace SmarterScheduling
                 && !p.health.HasHediffsNeedingTendByColony()
                 && p.health.capacities.CanBeAwake
                 && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
+                && !p.health.InPainShock
                 )
             {
                 p.jobs.StopAll(false);
