@@ -151,7 +151,7 @@ namespace SmarterScheduling
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
-                if (p.health.HasHediffsNeedingTendByColony())
+                if (p.health.HasHediffsNeedingTendByColony() && !(p.InMentalState))
                 {
                     return true;
                 }
