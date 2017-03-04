@@ -86,6 +86,10 @@ I think we can all agree that a Pawn staying longer in your Recreation Room is b
 
 So if you see a Pawn spending a long time in your Recreation/Psyche room, take a look at his Needs, and figure out what is wrong, and whether you can fix it.
 
+## Minor Tidbits
+
+There is a secondary behavior, for now, wherein the mod will determine if anyone needs Treatment, and if so, the mod will attempt to determine which Colonists are Doctors, and will force those Doctors into Work mode until no more Treatments are needed. (( No rest for the weary, it would seem. ))
+
 ## What This Mod Still Needs
 
 This mod is a proof of concept. I am a backend/algorithmic coder, I am not an interface designer.
