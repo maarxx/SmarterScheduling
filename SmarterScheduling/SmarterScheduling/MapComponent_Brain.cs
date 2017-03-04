@@ -118,7 +118,7 @@ namespace SmarterScheduling
                 p.timetable.SetAssignment(i, newTad);
             }
 
-            if (state == PawnState.JOY && p.needs.food.CurLevel > HUNGER_THRESH_LOW)
+            if (state == PawnState.JOY && p.needs.food.CurLevel < HUNGER_THRESH_LOW)
             {
                 p.playerSettings.AreaRestriction = psyche;
             }
