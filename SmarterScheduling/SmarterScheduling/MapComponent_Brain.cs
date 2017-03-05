@@ -134,6 +134,7 @@ namespace SmarterScheduling
                 && !p.health.HasHediffsNeedingTendByColony()
                 && p.health.capacities.CanBeAwake
                 && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
+                && !p.health.InPainShock
                 )
             {
                 p.jobs.StopAll(false);
@@ -151,7 +152,7 @@ namespace SmarterScheduling
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
-                if (p.health.HasHediffsNeedingTendByColony())
+                if (p.health.HasHediffsNeedingTendByColony() && !(p.InMentalState))
                 {
                     return true;
                 }
