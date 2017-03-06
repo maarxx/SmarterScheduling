@@ -19,7 +19,6 @@ namespace SmarterScheduling
 
         // Now defined per-pawn, please CTRL+F search for the same variable name.
         // Can be found further down in this same file.
-
         //public const float MOOD_THRESH_LOW  = 0.25F ;
         //public const float MOOD_THRESH_HIGH = 0.52F ;
 
@@ -39,14 +38,19 @@ namespace SmarterScheduling
         public int slowDown = 0;
 
         public bool anyoneAwaitingTreatment = false;
-
         public Dictionary<Pawn, int> doctorFaults;
+        public bool alreadyResetDoctorThisTick = false;
 
         public MapComponent_Brain(Map map) : base(map)
         {
             pawnStates = new Dictionary<Pawn, PawnState>();
+
             lastPawnAreas = new Dictionary<Pawn, Area>();
+
+            anyoneAwaitingTreatment = false;
             doctorFaults = new Dictionary<Pawn, int>();
+            alreadyResetDoctorThisTick = false;
+
             initPsycheArea();
             initPawnsIntoCollection();
         }
@@ -164,15 +168,21 @@ namespace SmarterScheduling
             }
         }
 
-        public void tryToResetPawn(Pawn p)
+        public bool tryToResetPawn(Pawn p)
         {
             if (p.health.capacities.CanBeAwake
                 && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
                 && !p.health.InPainShock
                 && !p.Drafted
+                && !p.CurJob.playerForced
                 )
             {
                 p.jobs.StopAll(false);
+                return true;
+            }
+            else
+            {
+                return false;
             }
 
         }
@@ -183,33 +193,49 @@ namespace SmarterScheduling
             pawnStates[p] = state;
             TimeAssignmentDef newTad;
 
-            if (isPawnDoctor(p))
+            // BEGIN DETOUR - we try to let the algorithm treat Doctors fairly,
+            // but if somebody isn't getting medical treatment, then
+            // we intervene and start handling Doctors differently
+            // so that nobody dies.
+            if (this.anyoneAwaitingTreatment)
             {
-                if (this.anyoneAwaitingTreatment)
+                if (!alreadyResetDoctorThisTick)
                 {
-                    if (state == PawnState.WORK)
+                    if (isPawnDoctor(p))
                     {
-                        if (!isPawnCurrentlyTreating(p))
+                        if (state == PawnState.WORK)
                         {
-                            tryToResetPawn(p);
+                            if (!isPawnCurrentlyTreating(p))
+                            {
+                                bool success = tryToResetPawn(p);
+                                if (success)
+                                {
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                            }
+                        }
+                        if (state == PawnState.JOY)
+                        {
+                            doctorFaults[p] += 1;
+                            if (doctorFaults[p] > 8)
+                            {
+                                setPawnState(p, PawnState.WORK);
+                                bool success = tryToResetPawn(p);
+                                if (success)
+                                {
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                                return;
+                            }
                         }
                     }
-                    if (state == PawnState.JOY)
-                    {
-                        doctorFaults[p] += 1;
-                        if (doctorFaults[p] > 5)
-                        {
-                            setPawnState(p, PawnState.WORK);
-                            tryToResetPawn(p);
-                            return;
-                        }
-                    }
-                }
-                else
-                {
-                    doctorFaults[p] = 0;
                 }
             }
+            else
+            {
+                doctorFaults[p] = 0;
+            }
+            // END DETOUR
 
             if (state == PawnState.SLEEP)
             {
@@ -265,6 +291,7 @@ namespace SmarterScheduling
             initPawnsIntoCollection();
 
             this.anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
+            this.alreadyResetDoctorThisTick = false;
 
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
