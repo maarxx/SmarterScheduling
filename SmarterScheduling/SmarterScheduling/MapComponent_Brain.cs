@@ -1,7 +1,6 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Verse;
 
 namespace SmarterScheduling
@@ -20,7 +19,6 @@ namespace SmarterScheduling
 
         // Now defined per-pawn, please CTRL+F search for the same variable name.
         // Can be found further down in this same file.
-
         //public const float MOOD_THRESH_LOW  = 0.25F ;
         //public const float MOOD_THRESH_HIGH = 0.52F ;
 
@@ -37,12 +35,22 @@ namespace SmarterScheduling
         public Area psyche;
         public Dictionary<Pawn, Area> lastPawnAreas;
 
-        int slowDown = 0;
+        public int slowDown = 0;
+
+        public bool anyoneAwaitingTreatment = false;
+        public Dictionary<Pawn, int> doctorFaults;
+        public bool alreadyResetDoctorThisTick = false;
 
         public MapComponent_Brain(Map map) : base(map)
         {
             pawnStates = new Dictionary<Pawn, PawnState>();
+
             lastPawnAreas = new Dictionary<Pawn, Area>();
+
+            anyoneAwaitingTreatment = false;
+            doctorFaults = new Dictionary<Pawn, int>();
+            alreadyResetDoctorThisTick = false;
+
             initPsycheArea();
             initPawnsIntoCollection();
         }
@@ -91,7 +99,92 @@ namespace SmarterScheduling
                 {
                     lastPawnAreas[p] = curPawnArea;
                 }
+                if (isPawnDoctor(p))
+                {
+                    if (!doctorFaults.ContainsKey(p))
+                    {
+                        doctorFaults.Add(p, 0);
+                    }
+                }
             }
+        }
+
+        public bool isAnyoneAwaitingTreatment()
+        {
+            Faction playerFaction = Find.FactionManager.FirstFactionOfDef(FactionDefOf.PlayerColony);
+            if (playerFaction == null)
+            {
+                playerFaction = Find.FactionManager.FirstFactionOfDef(FactionDefOf.PlayerTribe);
+            }
+            foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
+            {
+                if (
+                    p.health.HasHediffsNeedingTendByColony()
+                    && p.CurJob.def.reportString == "lying down."
+                    && !p.pather.Moving
+                    && !map.reservationManager.IsReserved(p, playerFaction)
+                    )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // If "treatment" is anywhere in your top 15 WorkGivers, you're a doctor.
+        // Otherwise, you're not a doctor.
+        public bool isPawnDoctor(Pawn p)
+        {
+            int i = 0;
+            foreach (WorkGiver wg in p.workSettings.WorkGiversInOrderNormal)
+            {
+                String workGiverString = wg.def.verb + "," + wg.def.priorityInType;
+                if (workGiverString == "treat,100")
+                {
+                    return true;
+                }
+                else if (workGiverString == "treat,70")
+                {
+                    return true;
+                }
+                if (i > 15)
+                {
+                    return false;
+                }
+                i++;
+            }
+            return false;
+        }
+
+        public bool isPawnCurrentlyTreating(Pawn p)
+        {
+            if (p.CurJob.def.reportString == "tending to TargetA.")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool tryToResetPawn(Pawn p)
+        {
+            if (p.health.capacities.CanBeAwake
+                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
+                && !p.health.InPainShock
+                && !p.Drafted
+                && !p.CurJob.playerForced
+                )
+            {
+                p.jobs.StopAll(false);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
         public void setPawnState(Pawn p, PawnState state)
@@ -99,6 +192,50 @@ namespace SmarterScheduling
 
             pawnStates[p] = state;
             TimeAssignmentDef newTad;
+
+            // BEGIN DETOUR - we try to let the algorithm treat Doctors fairly,
+            // but if somebody isn't getting medical treatment, then
+            // we intervene and start handling Doctors differently
+            // so that nobody dies.
+            if (this.anyoneAwaitingTreatment)
+            {
+                if (!alreadyResetDoctorThisTick)
+                {
+                    if (isPawnDoctor(p))
+                    {
+                        if (state == PawnState.WORK)
+                        {
+                            if (!isPawnCurrentlyTreating(p))
+                            {
+                                bool success = tryToResetPawn(p);
+                                if (success)
+                                {
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                            }
+                        }
+                        if (state == PawnState.JOY)
+                        {
+                            doctorFaults[p] += 1;
+                            if (doctorFaults[p] > 8)
+                            {
+                                setPawnState(p, PawnState.WORK);
+                                bool success = tryToResetPawn(p);
+                                if (success)
+                                {
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                doctorFaults[p] = 0;
+            }
+            // END DETOUR
 
             if (state == PawnState.SLEEP)
             {
@@ -132,57 +269,10 @@ namespace SmarterScheduling
                 && p.CurJob.def.reportString == "lying down."
                 && !(p.needs.rest.GUIChangeArrow > 0)
                 && !p.health.HasHediffsNeedingTendByColony()
-                && p.health.capacities.CanBeAwake
-                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0
-                && !p.health.InPainShock
                 )
             {
-                p.jobs.StopAll(false);
+                tryToResetPawn(p);
             }
-        }
-
-        /*
-        public PawnState getPawnState(Pawn p)
-        {
-            return pawnStates[p];
-        }
-        */
-
-        public bool doesAnyoneNeedTreatment()
-        {
-            foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
-            {
-                if (p.health.HasHediffsNeedingTendByColony() && !(p.InMentalState))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // If "treatment" is anywhere in your top 15 WorkGivers, you're a doctor.
-        // Otherwise, you're not a doctor.
-        public bool isPawnDoctor(Pawn p)
-        {
-            int i = 0;
-            foreach (WorkGiver wg in p.workSettings.WorkGiversInOrderNormal)
-            {
-                String workGiverString = wg.def.verb + "," + wg.def.priorityInType;
-                if (workGiverString == "treat,100")
-                {
-                    return true;
-                }
-                else if (workGiverString == "treat,70")
-                {
-                    return true;
-                }
-                if (i > 15)
-                {
-                    return false;
-                }
-                i++;
-            }
-            return false;
         }
 
         public override void MapComponentTick()
@@ -200,7 +290,8 @@ namespace SmarterScheduling
             initPsycheArea();
             initPawnsIntoCollection();
 
-            bool anyoneNeedTreatment = doesAnyoneNeedTreatment();
+            this.anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
+            this.alreadyResetDoctorThisTick = false;
 
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
@@ -208,7 +299,7 @@ namespace SmarterScheduling
                 float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
 
                 bool areDoctor = isPawnDoctor(p);
-                if (anyoneNeedTreatment && areDoctor)
+                if (anyoneAwaitingTreatment && areDoctor)
                 {
                     setPawnState(p, PawnState.WORK);
                     continue;
