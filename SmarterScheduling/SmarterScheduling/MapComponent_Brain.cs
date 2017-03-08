@@ -80,7 +80,7 @@ namespace SmarterScheduling
             {
                 if (!pawnStates.ContainsKey(p))
                 {
-                    pawnStates.Add(p, PawnState.WORK);
+                    pawnStates.Add(p, PawnState.ANYTHING);
                 }
                 if (!lastPawnAreas.ContainsKey(p))
                 {
@@ -132,6 +132,25 @@ namespace SmarterScheduling
                     )
                 {
                     return true;
+                }
+            }
+            return false;
+        }
+
+        public bool isPawnGainingImmunity(Pawn p)
+        {
+            foreach (Hediff h in p.health.hediffSet.hediffs)
+            {
+                if (h is HediffWithComps)
+                {
+                    HediffWithComps hwc = (HediffWithComps) h;
+                    foreach (HediffComp hc in hwc.comps)
+                    {
+                        if (hc is HediffComp_Immunizable)
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
@@ -288,6 +307,8 @@ namespace SmarterScheduling
                 float MOOD_THRESH_LOW      = p.mindState.mentalBreaker.BreakThresholdMajor   + 0.02F;
                 float MOOD_THRESH_HIGH     = p.mindState.mentalBreaker.BreakThresholdMinor   + 0.08F;
 
+                bool gainingImmunity = isPawnGainingImmunity(p);
+
                 bool isDoctor = false;
                 if (anyoneNeedingTreatment)
                 {
@@ -297,7 +318,12 @@ namespace SmarterScheduling
                     doctorFaults[p] = 0;
                 }
 
-                if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL || p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL)
+                if (gainingImmunity)
+                {
+                    setPawnState(p, PawnState.ANYTHING);
+                    restrictPawn(p, false);
+                }
+                else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL || p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL)
                 {
                     setPawnState(p, PawnState.ANYTHING);
                     restrictPawn(p, false);
