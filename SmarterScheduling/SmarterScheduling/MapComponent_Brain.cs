@@ -213,6 +213,23 @@ namespace SmarterScheduling
             return false;
         }
 
+        public bool isAnyOtherGenericEmergency()
+        {
+            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+            {
+                if (   p.needs.food.CurLevel == 0
+                       && (   !p.health.capacities.CanBeAwake
+                           || !(p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0)
+                           || p.health.InPainShock
+                           )
+                    )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public bool tryToResetPawn(Pawn p)
         {
             if (   p.health.capacities.CanBeAwake
@@ -302,6 +319,8 @@ namespace SmarterScheduling
                 }
             }
 
+            bool anyOtherGenericEmergency = isAnyOtherGenericEmergency();
+
             bool party = isThereAParty();
             //bool alreadyResetDoctorThisTick = false;
 
@@ -322,7 +341,12 @@ namespace SmarterScheduling
                     doctorFaults[p] = 0;
                 }
 
-                if (gainingImmunity)
+                if (anyOtherGenericEmergency)
+                {
+                    setPawnState(p, PawnState.ANYTHING);
+                    restrictPawn(p, false);
+                }
+                else if (gainingImmunity)
                 {
                     setPawnState(p, PawnState.ANYTHING);
                     restrictPawn(p, false);
