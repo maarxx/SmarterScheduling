@@ -148,7 +148,11 @@ namespace SmarterScheduling
                     {
                         if (hc is HediffComp_Immunizable)
                         {
-                            return true;
+                            HediffComp_Immunizable hci = (HediffComp_Immunizable) hc;
+                            if (!hci.FullyImmune)
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
