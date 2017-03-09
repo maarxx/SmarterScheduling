@@ -351,7 +351,12 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.ANYTHING);
                     restrictPawn(p, false);
                 }
-                else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL || p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL)
+                else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
+                {
+                    setPawnState(p, PawnState.ANYTHING);
+                    restrictPawn(p, false);
+                }
+                else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
                 {
                     setPawnState(p, PawnState.ANYTHING);
                     restrictPawn(p, false);
@@ -427,7 +432,8 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.ANYTHING);
                     restrictPawn(p, false);
                 }
-                else if (pawnStates[p] == PawnState.SLEEP && !(p.needs.rest.GUIChangeArrow > 0) && p.needs.rest.CurLevel > REST_THRESH_HIGH)
+                //else if (pawnStates[p] == PawnState.SLEEP && !(p.needs.rest.GUIChangeArrow > 0) && p.needs.rest.CurLevel > REST_THRESH_HIGH)
+                else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
                 {
                     setPawnState(p, PawnState.JOY);
                     restrictPawn(p, true);
