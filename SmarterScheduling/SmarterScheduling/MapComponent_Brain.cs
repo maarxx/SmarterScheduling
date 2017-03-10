@@ -200,7 +200,7 @@ namespace SmarterScheduling
         {
             foreach (Hediff h in p.health.hediffSet.hediffs)
             {
-                if (h is HediffWithComps)
+                if (h.Visible && h is HediffWithComps)
                 {
                     HediffWithComps hwc = (HediffWithComps) h;
                     foreach (HediffComp hc in hwc.comps)
@@ -208,7 +208,7 @@ namespace SmarterScheduling
                         if (hc is HediffComp_Immunizable)
                         {
                             HediffComp_Immunizable hci = (HediffComp_Immunizable) hc;
-                            if (!hci.FullyImmune)
+                            if (hci.Immunity > 0 && hci.Immunity < 1)
                             {
                                 return true;
                             }
@@ -503,13 +503,11 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.ANYTHING);
                     considerReleasingPawn(p);
                 }
-                /*
                 else if (gainingImmunity)
                 {
                     setPawnState(p, PawnState.ANYTHING);
                     considerReleasingPawn(p);
                 }
-                */
                 else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
                 {
                     setPawnState(p, PawnState.ANYTHING);
