@@ -28,7 +28,8 @@ namespace SmarterScheduling
         public const float JOY_THRESH_HIGH        = 0.90F ;
 
         public const string PSYCHE_NAME = "Psyche";
-        public const string TOXIC_NAME = "Toxic";
+        public const string TOXIC_NAME_H = "ToxicH";
+        public const string TOXIC_NAME_A = "ToxicA";
 
         public Dictionary<Pawn, PawnState> pawnStates;
         public Dictionary<Pawn, Area> lastPawnAreas;
@@ -49,15 +50,18 @@ namespace SmarterScheduling
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorFaults = new Dictionary<Pawn, int>();
             this.playerFaction = getPlayerFaction();
-            initPlayerAreas();
-            initPawnsIntoCollection();
+            //initPlayerAreas();
+            //initPawnsIntoCollection();
         }
 
         public void initPlayerAreas()
         {
             this.psyche = null;
+            this.humanToxic = null;
+            this.animalToxic = null;
             foreach (Area a in map.areaManager.AllAreas)
             {
+                Log.Message(a.ToString() + "," + a.AssignableAsAllowed(AllowedAreaMode.Humanlike) + "," + a.AssignableAsAllowed(AllowedAreaMode.Animal));
                 if (a.ToString() == PSYCHE_NAME)
                 {
                     if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
@@ -69,7 +73,7 @@ namespace SmarterScheduling
                         a.SetLabel(PSYCHE_NAME + "2");
                     }
                 }
-                else if (a.ToString() == TOXIC_NAME)
+                else if (a.ToString() == TOXIC_NAME_H)
                 {
                     if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
                     {
@@ -77,29 +81,40 @@ namespace SmarterScheduling
                     }
                     else
                     {
+                        a.SetLabel(TOXIC_NAME_H + "2");
+                    }
+                }
+                else if (a.ToString() == TOXIC_NAME_A)
+                {
+                    if (a.AssignableAsAllowed(AllowedAreaMode.Animal))
+                    {
                         this.animalToxic = a;
+                    }
+                    else
+                    {
+                        a.SetLabel(TOXIC_NAME_A + "2");
                     }
                 }
             }
             if (this.psyche == null)
             {
-                Area_Allowed newPsyche;
+                Area_Allowed newPsyche;// = new Area_Allowed(map.areaManager, AllowedAreaMode.Humanlike, PSYCHE_NAME);
                 map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newPsyche);
                 newPsyche.SetLabel(PSYCHE_NAME);
                 this.psyche = newPsyche;
             }
             if (this.humanToxic == null)
             {
-                Area_Allowed newHumanToxic;
+                Area_Allowed newHumanToxic;// = new Area_Allowed(map.areaManager, AllowedAreaMode.Humanlike, TOXIC_NAME_H);
                 map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newHumanToxic);
-                newHumanToxic.SetLabel(TOXIC_NAME);
+                newHumanToxic.SetLabel(TOXIC_NAME_H);
                 this.humanToxic = newHumanToxic;
             }
             if (this.animalToxic == null)
             {
-                Area_Allowed newAnimalToxic;
+                Area_Allowed newAnimalToxic;// = new Area_Allowed(map.areaManager, AllowedAreaMode.Animal, TOXIC_NAME_A);
                 map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Animal, out newAnimalToxic);
-                animalToxic.SetLabel(TOXIC_NAME);
+                newAnimalToxic.SetLabel(TOXIC_NAME_A);
                 this.animalToxic = newAnimalToxic;
             }
         }
