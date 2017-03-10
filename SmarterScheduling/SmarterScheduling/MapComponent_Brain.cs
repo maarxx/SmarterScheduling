@@ -28,14 +28,20 @@ namespace SmarterScheduling
         public const float JOY_THRESH_HIGH        = 0.90F ;
 
         public const string PSYCHE_NAME = "Psyche";
+        public const string TOXIC_NAME = "Toxic";
 
         public Dictionary<Pawn, PawnState> pawnStates;
         public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorFaults;
         public Faction playerFaction;
         public Area psyche;
+        public Area humanToxic;
+        public Area animalToxic;
 
         public int slowDown = 0;
+
+        public bool toxicFallout = false;
+        public bool toxicLatch = false;
 
         public MapComponent_Brain(Map map) : base(map)
         {
@@ -43,11 +49,11 @@ namespace SmarterScheduling
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorFaults = new Dictionary<Pawn, int>();
             this.playerFaction = getPlayerFaction();
-            initPsycheArea();
+            initPlayerAreas();
             initPawnsIntoCollection();
         }
 
-        public void initPsycheArea()
+        public void initPlayerAreas()
         {
             this.psyche = null;
             foreach (Area a in map.areaManager.AllAreas)
@@ -57,11 +63,21 @@ namespace SmarterScheduling
                     if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
                     {
                         this.psyche = a;
-                        break;
                     }
                     else
                     {
                         a.SetLabel(PSYCHE_NAME + "2");
+                    }
+                }
+                else if (a.ToString() == TOXIC_NAME)
+                {
+                    if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
+                    {
+                        this.humanToxic = a;
+                    }
+                    else
+                    {
+                        this.animalToxic = a;
                     }
                 }
             }
@@ -72,24 +88,46 @@ namespace SmarterScheduling
                 newPsyche.SetLabel(PSYCHE_NAME);
                 this.psyche = newPsyche;
             }
+            if (this.humanToxic == null)
+            {
+                Area_Allowed newHumanToxic;
+                map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newHumanToxic);
+                newHumanToxic.SetLabel(TOXIC_NAME);
+                this.humanToxic = newHumanToxic;
+            }
+            if (this.animalToxic == null)
+            {
+                Area_Allowed newAnimalToxic;
+                map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Animal, out newAnimalToxic);
+                animalToxic.SetLabel(TOXIC_NAME);
+                this.animalToxic = newAnimalToxic;
+            }
         }
 
         public void initPawnsIntoCollection()
         {
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+            foreach (Pawn p in map.mapPawns.PawnsInFaction(this.playerFaction))
             {
-                if (!pawnStates.ContainsKey(p))
-                {
-                    pawnStates.Add(p, PawnState.ANYTHING);
-                }
                 if (!lastPawnAreas.ContainsKey(p))
                 {
                     lastPawnAreas.Add(p, null);
                 }
                 Area curPawnArea = p.playerSettings.AreaRestriction;
-                if (curPawnArea == null || curPawnArea != psyche)
+                if (curPawnArea == null
+                    || (curPawnArea != psyche
+                        && curPawnArea != humanToxic
+                        && curPawnArea != animalToxic
+                        )
+                    )
                 {
                     lastPawnAreas[p] = curPawnArea;
+                }
+            }
+            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+            {
+                if (!pawnStates.ContainsKey(p))
+                {
+                    pawnStates.Add(p, PawnState.ANYTHING);
                 }
                 if (!doctorFaults.ContainsKey(p))
                 {
@@ -199,6 +237,18 @@ namespace SmarterScheduling
             }
         }
 
+        public bool isPawnAnimal(Pawn p)
+        {
+            if (p.needs.joy == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public bool isThereAParty()
         {
             foreach (Lord l in map.lordManager.lords)
@@ -212,6 +262,11 @@ namespace SmarterScheduling
                 }
             }
             return false;
+        }
+
+        public bool isToxicFallout()
+        {
+            return map.mapConditionManager.ConditionIsActive(MapConditionDefOf.ToxicFallout);
         }
 
         public bool isAnyOtherGenericEmergency()
@@ -280,6 +335,7 @@ namespace SmarterScheduling
 
         }
 
+        /*
         public void restrictPawn(Pawn p, bool restrict)
         {
             if (restrict)
@@ -289,6 +345,43 @@ namespace SmarterScheduling
             else
             {
                 p.playerSettings.AreaRestriction = lastPawnAreas[p];
+            }
+        }
+        */
+
+        /*
+        public void restrictPawn(Pawn p, Area a)
+        {
+
+        }
+        */
+
+        public void restrictPawnToPsyche(Pawn p)
+        {
+            p.playerSettings.AreaRestriction = this.psyche;
+        }
+
+        public void considerReleasingPawn(Pawn p)
+        {
+            if (this.toxicFallout)
+            {
+                foreach (Hediff h in p.health.hediffSet.hediffs)
+                {
+                    if (h.def.Equals(HediffDefOf.ToxicBuildup)) {
+                        if (h.Severity > 0.35F)
+                        {
+                            p.playerSettings.AreaRestriction = this.humanToxic;
+                        }
+                        else if (h.Severity < 0.25F)
+                        {
+                            p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+                        }
+                    }
+                }
+            }
+            else
+            {
+                p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
             }
         }
 
@@ -304,12 +397,18 @@ namespace SmarterScheduling
                 slowDown = 0;
             }
 
-            initPsycheArea();
+            initPlayerAreas();
             initPawnsIntoCollection();
 
             bool anyoneNeedingTreatment = isAnyoneNeedingTreatment();
             bool anyoneAwaitingTreatment = false;
             Random randGen = null;
+
+            this.toxicFallout = isToxicFallout();
+            if (toxicFallout)
+            {
+                this.toxicLatch = true;
+            }
             
             if (anyoneNeedingTreatment)
             {
@@ -324,6 +423,28 @@ namespace SmarterScheduling
 
             bool party = isThereAParty();
             //bool alreadyResetDoctorThisTick = false;
+
+            if (this.toxicFallout || this.toxicLatch)
+            {
+                foreach (Pawn p in map.mapPawns.PawnsInFaction(this.playerFaction))
+                {
+                    if (isPawnAnimal(p))
+                    {
+                        if (toxicFallout)
+                        {
+                            considerReleasingPawn(p);
+                        }
+                        else
+                        {
+                            p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+                        }
+                    }
+                }
+                if (this.toxicFallout == false)
+                {
+                    this.toxicLatch = false;
+                }
+            }
 
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
@@ -345,39 +466,39 @@ namespace SmarterScheduling
                 if (anyOtherGenericEmergency)
                 {
                     setPawnState(p, PawnState.ANYTHING);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 else if (gainingImmunity)
                 {
                     setPawnState(p, PawnState.ANYTHING);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
                 {
                     setPawnState(p, PawnState.ANYTHING);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
                 {
                     setPawnState(p, PawnState.ANYTHING);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
                 {
                     if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                     {
                         setPawnState(p, PawnState.SLEEP);
-                        restrictPawn(p, false);
+                        considerReleasingPawn(p);
                     }
                     else if (p.needs.rest.GUIChangeArrow > 0)
                     {
                         setPawnState(p, PawnState.SLEEP);
-                        restrictPawn(p, false);
+                        considerReleasingPawn(p);
                     }
                     else
                     {
                         setPawnState(p, PawnState.JOY);
-                        restrictPawn(p, false);
+                        restrictPawnToPsyche(p);
                     }
                 }
                 else if (anyoneNeedingTreatment && isDoctor)
@@ -389,7 +510,7 @@ namespace SmarterScheduling
                         {
                             doctorFaults[p] = 0;
                             // Deliberately not setPawnState()
-                            // Deliberately not restrictPawn()
+                            // Deliberately not Restrict or Release
                         }
                         else
                         {
@@ -397,26 +518,29 @@ namespace SmarterScheduling
                             if (doctorFaults[p] > 20)
                             {
                                 setPawnState(p, PawnState.WORK);
-                                restrictPawn(p, false);
-                                tryToResetPawn(p);
+                                considerReleasingPawn(p);
+                                if (!this.toxicFallout)
+                                {
+                                    tryToResetPawn(p);
+                                }
                             }
                             else
                             {
                                 setPawnState(p, PawnState.ANYTHING);
-                                restrictPawn(p, false);
+                                considerReleasingPawn(p);
                             }
                         }
                     }
                     else
                     {
                         setPawnState(p, PawnState.ANYTHING);
-                        restrictPawn(p, false);
+                        considerReleasingPawn(p);
                     }
                 }
                 else if (party)
                 {
                     setPawnState(p, PawnState.ANYTHING);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                     if (
                         p.CurJob.def.reportString == "lying down."
                         && !p.health.HasHediffsNeedingTendByColony()
@@ -428,53 +552,53 @@ namespace SmarterScheduling
                 else if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                 {
                     setPawnState(p, PawnState.SLEEP);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 else if (p.needs.rest.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.SLEEP);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 else if (anyoneNeedingTreatment && p.health.HasHediffsNeedingTendByColony())
                 {
                     setPawnState(p, PawnState.ANYTHING);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
                 //else if (pawnStates[p] == PawnState.SLEEP && !(p.needs.rest.GUIChangeArrow > 0) && p.needs.rest.CurLevel > REST_THRESH_HIGH)
                 else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
                 {
                     setPawnState(p, PawnState.JOY);
-                    restrictPawn(p, true);
+                    restrictPawnToPsyche(p);
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
                 {
                     setPawnState(p, PawnState.JOY);
-                    restrictPawn(p, true);
+                    restrictPawnToPsyche(p);
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.joy.CurLevel < JOY_THRESH_HIGH)
                 {
                     setPawnState(p, PawnState.JOY);
-                    restrictPawn(p, true);
+                    restrictPawnToPsyche(p);
                 }
                 else if (pawnStates[p] == PawnState.JOY && p.needs.mood.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.JOY);
-                    restrictPawn(p, true);
+                    restrictPawnToPsyche(p);
                 }
                 else if (p.needs.mood.CurLevel < MOOD_THRESH_LOW)
                 {
                     setPawnState(p, PawnState.JOY);
-                    restrictPawn(p, true);
+                    restrictPawnToPsyche(p);
                 }
                 else if (p.needs.joy.CurLevel < JOY_THRESH_LOW)
                 {
                     setPawnState(p, PawnState.JOY);
-                    restrictPawn(p, true);
+                    restrictPawnToPsyche(p);
                 }
                 else
                 {
                     setPawnState(p, PawnState.WORK);
-                    restrictPawn(p, false);
+                    considerReleasingPawn(p);
                 }
 
                 if (
