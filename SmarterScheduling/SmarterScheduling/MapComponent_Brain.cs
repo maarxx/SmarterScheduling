@@ -112,7 +112,7 @@ namespace SmarterScheduling
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
-                if (p.health.HasHediffsNeedingTendByColony())
+                if (p.health.HasHediffsNeedingTendByColony() && p.playerSettings.medCare > 0)
                 {
                     return true;
                 }
@@ -126,6 +126,7 @@ namespace SmarterScheduling
             {
                 if (
                     p.health.HasHediffsNeedingTendByColony()
+                    && p.playerSettings.medCare > 0
                     && p.CurJob.def.reportString == "lying down."
                     && !p.pather.Moving
                     && !map.reservationManager.IsReserved(p, this.playerFaction)
@@ -416,6 +417,13 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.ANYTHING);
                     restrictPawn(p, false);
+                    if (
+                        p.CurJob.def.reportString == "lying down."
+                        && !p.health.HasHediffsNeedingTendByColony()
+                        )
+                    {
+                        tryToResetPawn(p);
+                    }
                 }
                 else if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                 {
@@ -484,49 +492,3 @@ namespace SmarterScheduling
 
     }
 }
-
-/*
-// BEGIN DETOUR - we try to let the algorithm treat Doctors fairly,
-            // but if somebody isn't getting medical treatment, then
-            // we intervene and start handling Doctors differently
-            // so that nobody dies.
-            if (this.anyoneAwaitingTreatment)
-            {
-    if (!alreadyResetDoctorThisTick)
-    {
-        if (isPawnDoctor(p))
-        {
-            if (state == PawnState.WORK)
-            {
-                if (!isPawnCurrentlyTreating(p))
-                {
-                    bool success = tryToResetPawn(p);
-                    if (success)
-                    {
-                        alreadyResetDoctorThisTick = true;
-                    }
-                }
-            }
-            if (state == PawnState.JOY)
-            {
-                doctorFaults[p] += 1;
-                if (doctorFaults[p] > 8)
-                {
-                    setPawnState(p, PawnState.WORK);
-                    bool success = tryToResetPawn(p);
-                    if (success)
-                    {
-                        alreadyResetDoctorThisTick = true;
-                    }
-                    return;
-                }
-            }
-        }
-    }
-}
-            else
-            {
-    doctorFaults[p] = 0;
-}
-            // END DETOUR
-*/
