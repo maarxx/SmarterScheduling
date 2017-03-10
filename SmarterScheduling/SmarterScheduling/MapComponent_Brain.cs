@@ -34,6 +34,7 @@ namespace SmarterScheduling
         public Dictionary<Pawn, PawnState> pawnStates;
         public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorFaults;
+        public Dictionary<Pawn, bool> toxicBounces;
         public Faction playerFaction;
         public Area psyche;
         public Area humanToxic;
@@ -49,6 +50,7 @@ namespace SmarterScheduling
             this.pawnStates = new Dictionary<Pawn, PawnState>();
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorFaults = new Dictionary<Pawn, int>();
+            this.toxicBounces = new Dictionary<Pawn, bool>();
             this.playerFaction = getPlayerFaction();
             //initPlayerAreas();
             //initPawnsIntoCollection();
@@ -61,7 +63,6 @@ namespace SmarterScheduling
             this.animalToxic = null;
             foreach (Area a in map.areaManager.AllAreas)
             {
-                Log.Message(a.ToString() + "," + a.AssignableAsAllowed(AllowedAreaMode.Humanlike) + "," + a.AssignableAsAllowed(AllowedAreaMode.Animal));
                 if (a.ToString() == PSYCHE_NAME)
                 {
                     if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
@@ -126,6 +127,10 @@ namespace SmarterScheduling
                 if (!lastPawnAreas.ContainsKey(p))
                 {
                     lastPawnAreas.Add(p, null);
+                }
+                if (!toxicBounces.ContainsKey(p))
+                {
+                    toxicBounces.Add(p, false);
                 }
                 Area curPawnArea = p.playerSettings.AreaRestriction;
                 if (curPawnArea == null
@@ -383,16 +388,31 @@ namespace SmarterScheduling
                 foreach (Hediff h in p.health.hediffSet.hediffs)
                 {
                     if (h.def.Equals(HediffDefOf.ToxicBuildup)) {
-                        if (h.Severity > 0.35F)
+                        if (h.Severity < 0.25F)
                         {
-                            p.playerSettings.AreaRestriction = this.humanToxic;
-                        }
-                        else if (h.Severity < 0.25F)
-                        {
+                            this.toxicBounces[p] = false;
                             p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+                            return;
+                        }
+                        else if (h.Severity > 0.35F || this.toxicBounces[p])
+                        {
+                            this.toxicBounces[p] = true;
+                            if (isPawnAnimal(p))
+                            {
+                                p.playerSettings.AreaRestriction = this.animalToxic;
+                                return;
+                            }
+                            else
+                            {
+                                p.playerSettings.AreaRestriction = this.humanToxic;
+                                return;
+                            }
                         }
                     }
                 }
+                this.toxicBounces[p] = false;
+                p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+                return;
             }
             else
             {
@@ -420,7 +440,7 @@ namespace SmarterScheduling
             Random randGen = null;
 
             this.toxicFallout = isToxicFallout();
-            if (toxicFallout)
+            if (this.toxicFallout)
             {
                 this.toxicLatch = true;
             }
@@ -483,11 +503,13 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.ANYTHING);
                     considerReleasingPawn(p);
                 }
+                /*
                 else if (gainingImmunity)
                 {
                     setPawnState(p, PawnState.ANYTHING);
                     considerReleasingPawn(p);
                 }
+                */
                 else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
                 {
                     setPawnState(p, PawnState.ANYTHING);
