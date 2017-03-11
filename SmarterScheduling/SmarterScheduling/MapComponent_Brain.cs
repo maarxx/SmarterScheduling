@@ -313,6 +313,7 @@ namespace SmarterScheduling
                 && !p.health.InPainShock
                 && !p.Drafted
                 && !p.CurJob.playerForced
+                && !p.CurJob.def.reportString.Equals("consuming TargetA.")
                 )
             {
                 p.jobs.StopAll(false);
