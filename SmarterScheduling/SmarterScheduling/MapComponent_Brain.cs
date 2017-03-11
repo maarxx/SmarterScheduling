@@ -186,6 +186,7 @@ namespace SmarterScheduling
                     p.health.HasHediffsNeedingTendByColony()
                     && p.playerSettings.medCare > 0
                     && p.CurJob.def.reportString == "lying down."
+                    && p.CurJob.targetA.Thing != null
                     && !p.pather.Moving
                     && !map.reservationManager.IsReserved(p, this.playerFaction)
                     )
