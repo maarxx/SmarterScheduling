@@ -33,7 +33,7 @@ namespace SmarterScheduling
 
         public Dictionary<Pawn, PawnState> pawnStates;
         public Dictionary<Pawn, Area> lastPawnAreas;
-        public Dictionary<Pawn, int> doctorFaults;
+        public Dictionary<Pawn, int> doctorResetTick;
         public Dictionary<Pawn, bool> toxicBounces;
         public Faction playerFaction;
         public Area psyche;
@@ -49,7 +49,7 @@ namespace SmarterScheduling
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
-            this.doctorFaults = new Dictionary<Pawn, int>();
+            this.doctorResetTick = new Dictionary<Pawn, int>();
             this.toxicBounces = new Dictionary<Pawn, bool>();
             this.playerFaction = getPlayerFaction();
             //initPlayerAreas();
@@ -148,10 +148,6 @@ namespace SmarterScheduling
                 if (!pawnStates.ContainsKey(p))
                 {
                     pawnStates.Add(p, PawnState.ANYTHING);
-                }
-                if (!doctorFaults.ContainsKey(p))
-                {
-                    doctorFaults.Add(p, 0);
                 }
             }
         }
@@ -439,27 +435,26 @@ namespace SmarterScheduling
 
             bool anyoneNeedingTreatment = isAnyoneNeedingTreatment();
             bool anyoneAwaitingTreatment = false;
-            Random randGen = null;
+            bool alreadyResetDoctorThisTick = false;
+            Pawn oldestDoctor = null;
+            if (anyoneNeedingTreatment)
+            {
+                anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
+                if (this.doctorResetTick.Count > 0)
+                {
+                    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                }
+            }
 
             this.toxicFallout = isToxicFallout();
             if (this.toxicFallout)
             {
                 this.toxicLatch = true;
-            }
-            
-            if (anyoneNeedingTreatment)
-            {
-                anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
-                if (anyoneAwaitingTreatment)
-                {
-                    randGen = new Random();
-                }
-            }
+            }      
 
             bool anyOtherGenericEmergency = isAnyOtherGenericEmergency();
 
             bool party = isThereAParty();
-            //bool alreadyResetDoctorThisTick = false;
 
             if (this.toxicFallout || this.toxicLatch)
             {
@@ -495,9 +490,20 @@ namespace SmarterScheduling
                 if (anyoneNeedingTreatment)
                 {
                     isDoctor = isPawnDoctor(p);
-                } else
-                {
-                    doctorFaults[p] = 0;
+                    if (isDoctor)
+                    {
+                        if (!this.doctorResetTick.ContainsKey(p))
+                        {
+                            this.doctorResetTick.Add(p, 0);
+                        }
+                    }
+                    else
+                    {
+                        if (this.doctorResetTick.ContainsKey(p))
+                        {
+                            this.doctorResetTick.Remove(p);
+                        }
+                    }
                 }
 
                 if (anyOtherGenericEmergency)
@@ -542,23 +548,20 @@ namespace SmarterScheduling
                 {
                     if (anyoneAwaitingTreatment)
                     {
-                        bool pawnTreating = isPawnCurrentlyTreating(p);
-                        if (pawnTreating)
+                        if (!isPawnCurrentlyTreating(p))
                         {
-                            doctorFaults[p] = 0;
-                            // Deliberately not setPawnState()
-                            // Deliberately not Restrict or Release
-                        }
-                        else
-                        {
-                            doctorFaults[p] += randGen.Next(5);
-                            if (doctorFaults[p] > 20)
+                            if (!alreadyResetDoctorThisTick && p.Equals(oldestDoctor))
                             {
                                 setPawnState(p, PawnState.WORK);
                                 considerReleasingPawn(p);
-                                if (!this.toxicFallout)
+                                this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                                if (tryToResetPawn(p))
                                 {
-                                    tryToResetPawn(p);
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                                else
+                                {
+                                    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
                                 }
                             }
                             else
@@ -566,6 +569,11 @@ namespace SmarterScheduling
                                 setPawnState(p, PawnState.ANYTHING);
                                 considerReleasingPawn(p);
                             }
+                        }
+                        else
+                        {
+                            setPawnState(p, PawnState.ANYTHING);
+                            considerReleasingPawn(p);
                         }
                     }
                     else
