@@ -554,9 +554,15 @@ namespace SmarterScheduling
                             {
                                 setPawnState(p, PawnState.WORK);
                                 considerReleasingPawn(p);
-                                tryToResetPawn(p);
                                 this.doctorResetTick[p] = Find.TickManager.TicksGame;
-                                alreadyResetDoctorThisTick = true;
+                                if (tryToResetPawn(p))
+                                {
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                                else
+                                {
+                                    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                                }
                             }
                             else
                             {
