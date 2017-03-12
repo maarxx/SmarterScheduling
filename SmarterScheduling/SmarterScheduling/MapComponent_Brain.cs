@@ -440,7 +440,10 @@ namespace SmarterScheduling
             if (anyoneNeedingTreatment)
             {
                 anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
-                oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                if (this.doctorResetTick.Count > 0)
+                {
+                    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                }
             }
 
             this.toxicFallout = isToxicFallout();
