@@ -417,10 +417,13 @@ namespace SmarterScheduling
                 Pawn oldestDoctor = null;
                 if (anyoneNeedingTreatment)
                 {
+                    Log.Message("Someone needing treatment: " + anyoneNeedingTreatment);
                     anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
+                    Log.Message("Someone awaiting treatment: " + anyoneAwaitingTreatment);
                     if (this.doctorResetTick.Count > 0)
                     {
                         oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                        Log.Message("Oldest Doctor: " + oldestDoctor.NameStringShort);
                     }
                 }
 
@@ -456,6 +459,8 @@ namespace SmarterScheduling
 
                 foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
                 {
+                    Log.Message("PROCESSING: " + p.NameStringShort);
+
                     float MOOD_THRESH_CRITICAL = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02F;
                     float MOOD_THRESH_LOW = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02F;
                     float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
@@ -484,21 +489,25 @@ namespace SmarterScheduling
 
                     if (gainingImmunity)
                     {
+                        Log.Message("gainingImmunity");
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                     }
                     else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
                     {
+                        Log.Message("REST_THRESH_CRITICAL");
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                     }
                     else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
                     {
+                        Log.Message("HUNGER_THRESH_CRITICAL");
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                     }
                     else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
                     {
+                        Log.Message("MOOD_THRESH_CRITICAL");
                         if (p.needs.rest.CurLevel < REST_THRESH_LOW)
                         {
                             setPawnState(p, PawnState.SLEEP);
@@ -517,23 +526,26 @@ namespace SmarterScheduling
                     }
                     else if (anyoneNeedingTreatment && isDoctor)
                     {
+                        Log.Message("anyoneNeedingTreatment && isDoctor");
                         if (anyoneAwaitingTreatment)
                         {
+                            Log.Message("anyoneAwaitingTreatment");
                             if (!isPawnCurrentlyTreating(p))
                             {
+                                Log.Message("!isPawnCurrentlyTreating(p)");
                                 if (!alreadyResetDoctorThisTick && p.Equals(oldestDoctor))
                                 {
                                     setPawnState(p, PawnState.WORK);
                                     considerReleasingPawn(p);
-                                    this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                                    //this.doctorResetTick[p] = Find.TickManager.TicksGame;
                                     if (tryToResetPawn(p))
                                     {
                                         alreadyResetDoctorThisTick = true;
                                     }
-                                    else
-                                    {
-                                        oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
-                                    }
+                                    //else
+                                    //{
+                                    //    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                                    //}
                                 }
                                 else
                                 {
@@ -543,6 +555,7 @@ namespace SmarterScheduling
                             }
                             else
                             {
+                                this.doctorResetTick[p] = Find.TickManager.TicksGame;
                                 setPawnState(p, PawnState.ANYTHING);
                                 considerReleasingPawn(p);
                             }
