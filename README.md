@@ -11,6 +11,7 @@ This is a mod for the game RimWorld by Ludeon Studios.
 * [How to Install](#how-to-install)
 * [How to Update](#how-to-update)
 * [Bugs, New Features, and Updates](#bugs-new-features-and-updates)
+* [Contributors](#contributors)
 
 # Introduction
 
@@ -204,6 +205,8 @@ You can look here to see if your bug, issue, or suggestion is already present, a
 
 If it's not there, look to the right-hand-side, click the green button "New issue", just type a Title, and Leave a comment, and then look below and click the green button "Submit new issue". I will get back to you. Maybe. Eventually. Meanwhile, other users might be able to chime in and help you too!
 
+# Contributors
+
 #### Credits
 
 Credit is due to [FluffierThanThou](https://github.com/FluffierThanThou?tab=repositories), although he doesn't even know it.
@@ -212,10 +215,10 @@ I had absolutely no idea how to write a RimWorld mod, and whenever I needed a hi
 
 You should check out his other mods! They are awesome, and I use many of them!
 
-Credit is also due to Zorba, who also writes awesome mods. I don't know if I've read Zorba's source code, but Zorba helped keep this game fun and interesting for me, certainly long enough to write this mod.
+Credit is also due to Zorba, who also writes awesome mods. I don't know if I've read Zorba's source code, but Zorba helped fix some of the game's other shortcomings, keeping the game fun for me, certainly long enough for me to write this mod.
 
 #### Call for Contributors
 
-For the love of god, this mod needs a user interface, and the thresholds should be configurable in-game through some slider bars. I don't know how to do any of this.
+This mod needs a user interface, and the thresholds should be configurable in-game through some slider bars. I don't know how to do any of this.
 
 Even better would be if the thresholds were configurable per-pawn. If you are willing to write the interface for this, let me know, and I will write a fork with the back-end support.
