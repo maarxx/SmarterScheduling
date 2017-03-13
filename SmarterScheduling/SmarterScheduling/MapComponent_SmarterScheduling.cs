@@ -486,16 +486,19 @@ namespace SmarterScheduling
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame;  }
                     }
                     else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
                     else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
                     else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
                     {
@@ -514,13 +517,14 @@ namespace SmarterScheduling
                             setPawnState(p, PawnState.JOY);
                             restrictPawnToPsyche(p);
                         }
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
                     else if (anyoneAwaitingTreatment && isDoctor)
                     {
                         if (isPawnCurrentlyTreating(p))
                         {
                             this.doctorResetTick[p] = Find.TickManager.TicksGame;
-                            setPawnState(p, PawnState.ANYTHING);
+                            //setPawnState(p, PawnState.ANYTHING);
                             //considerReleasingPawn(p);
                         }
                         else
