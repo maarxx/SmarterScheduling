@@ -6,7 +6,7 @@ using Verse.AI.Group;
 
 namespace SmarterScheduling
 {
-    class MapComponent_Brain : MapComponent
+    class MapComponent_SmarterScheduling : MapComponent
     {
 
         public enum PawnState
@@ -40,18 +40,24 @@ namespace SmarterScheduling
         public Area humanToxic;
         public Area animalToxic;
 
-        public int slowDown = 0;
+        public int slowDown;
 
-        public bool toxicFallout = false;
-        public bool toxicLatch = false;
+        public bool enabled;
 
-        public MapComponent_Brain(Map map) : base(map)
+        public bool toxicFallout;
+        public bool toxicLatch;
+
+        public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorResetTick = new Dictionary<Pawn, int>();
             this.toxicBounces = new Dictionary<Pawn, bool>();
             this.playerFaction = getPlayerFaction();
+            this.enabled = false;
+            this.toxicFallout = false;
+            this.toxicLatch = false;
+            this.slowDown = 0;
             //initPlayerAreas();
             //initPawnsIntoCollection();
         }
@@ -286,6 +292,7 @@ namespace SmarterScheduling
             return map.mapConditionManager.ConditionIsActive(MapConditionDefOf.ToxicFallout);
         }
 
+        /*
         public bool isAnyOtherGenericEmergency()
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
@@ -302,6 +309,7 @@ namespace SmarterScheduling
             }
             return false;
         }
+        */
 
         public bool tryToResetPawn(Pawn p)
         {
@@ -321,6 +329,14 @@ namespace SmarterScheduling
                 return false;
             }
 
+        }
+
+        public void resetAllSchedules(PawnState state)
+        {
+            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+            {
+                setPawnState(p, state);
+            }
         }
 
         public void setPawnState(Pawn p, PawnState state)
@@ -420,148 +436,159 @@ namespace SmarterScheduling
 
         public override void MapComponentTick()
         {
-            slowDown++;
-            if (slowDown < 100)
+            if (enabled)
             {
-                return;
-            }
-            else
-            {
-                slowDown = 0;
-            }
-
-            initPlayerAreas();
-            initPawnsIntoCollection();
-
-            bool anyoneNeedingTreatment = isAnyoneNeedingTreatment();
-            bool anyoneAwaitingTreatment = false;
-            bool alreadyResetDoctorThisTick = false;
-            Pawn oldestDoctor = null;
-            if (anyoneNeedingTreatment)
-            {
-                anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
-                if (this.doctorResetTick.Count > 0)
+                slowDown++;
+                if (slowDown < 100)
                 {
-                    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                    return;
                 }
-            }
-
-            this.toxicFallout = isToxicFallout();
-            if (this.toxicFallout)
-            {
-                this.toxicLatch = true;
-            }      
-
-            bool anyOtherGenericEmergency = isAnyOtherGenericEmergency();
-
-            bool party = isThereAParty();
-
-            if (this.toxicFallout || this.toxicLatch)
-            {
-                foreach (Pawn p in map.mapPawns.PawnsInFaction(this.playerFaction))
+                else
                 {
-                    if (isPawnAnimal(p))
+                    slowDown = 0;
+                }
+
+                initPlayerAreas();
+                initPawnsIntoCollection();
+
+                bool anyoneNeedingTreatment = isAnyoneNeedingTreatment();
+                bool anyoneAwaitingTreatment = false;
+                bool alreadyResetDoctorThisTick = false;
+                Pawn oldestDoctor = null;
+                if (anyoneNeedingTreatment)
+                {
+                    anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
+                    if (this.doctorResetTick.Count > 0)
                     {
-                        if (toxicFallout)
+                        oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                    }
+                }
+
+                this.toxicFallout = isToxicFallout();
+                if (this.toxicFallout)
+                {
+                    this.toxicLatch = true;
+                }
+
+                //bool anyOtherGenericEmergency = isAnyOtherGenericEmergency();
+
+                bool party = isThereAParty();
+
+                if (this.toxicFallout || this.toxicLatch)
+                {
+                    foreach (Pawn p in map.mapPawns.PawnsInFaction(this.playerFaction))
+                    {
+                        if (isPawnAnimal(p))
                         {
+                            if (toxicFallout)
+                            {
+                                considerReleasingPawn(p);
+                            }
+                            else
+                            {
+                                p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+                            }
+                        }
+                    }
+                    if (this.toxicFallout == false)
+                    {
+                        this.toxicLatch = false;
+                    }
+                }
+
+                foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+                {
+                    float MOOD_THRESH_CRITICAL = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02F;
+                    float MOOD_THRESH_LOW = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02F;
+                    float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
+
+                    bool gainingImmunity = isPawnGainingImmunity(p);
+
+                    bool isDoctor = false;
+                    if (anyoneNeedingTreatment)
+                    {
+                        isDoctor = isPawnDoctor(p);
+                        if (isDoctor)
+                        {
+                            if (!this.doctorResetTick.ContainsKey(p))
+                            {
+                                this.doctorResetTick.Add(p, 0);
+                            }
+                        }
+                        else
+                        {
+                            if (this.doctorResetTick.ContainsKey(p))
+                            {
+                                this.doctorResetTick.Remove(p);
+                            }
+                        }
+                    }
+
+                    /*
+                    if (anyOtherGenericEmergency)
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        considerReleasingPawn(p);
+                    }
+                    else
+                    */
+                    if (gainingImmunity)
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        considerReleasingPawn(p);
+                    }
+                    else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        considerReleasingPawn(p);
+                    }
+                    else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        considerReleasingPawn(p);
+                    }
+                    else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
+                    {
+                        if (p.needs.rest.CurLevel < REST_THRESH_LOW)
+                        {
+                            setPawnState(p, PawnState.SLEEP);
+                            considerReleasingPawn(p);
+                        }
+                        else if (p.needs.rest.GUIChangeArrow > 0)
+                        {
+                            setPawnState(p, PawnState.SLEEP);
                             considerReleasingPawn(p);
                         }
                         else
                         {
-                            p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+                            setPawnState(p, PawnState.JOY);
+                            restrictPawnToPsyche(p);
                         }
                     }
-                }
-                if (this.toxicFallout == false)
-                {
-                    this.toxicLatch = false;
-                }
-            }
-
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
-            {
-                float MOOD_THRESH_CRITICAL = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02F;
-                float MOOD_THRESH_LOW      = p.mindState.mentalBreaker.BreakThresholdMajor   + 0.02F;
-                float MOOD_THRESH_HIGH     = p.mindState.mentalBreaker.BreakThresholdMinor   + 0.08F;
-
-                bool gainingImmunity = isPawnGainingImmunity(p);
-
-                bool isDoctor = false;
-                if (anyoneNeedingTreatment)
-                {
-                    isDoctor = isPawnDoctor(p);
-                    if (isDoctor)
+                    else if (anyoneNeedingTreatment && isDoctor)
                     {
-                        if (!this.doctorResetTick.ContainsKey(p))
+                        if (anyoneAwaitingTreatment)
                         {
-                            this.doctorResetTick.Add(p, 0);
-                        }
-                    }
-                    else
-                    {
-                        if (this.doctorResetTick.ContainsKey(p))
-                        {
-                            this.doctorResetTick.Remove(p);
-                        }
-                    }
-                }
-
-                if (anyOtherGenericEmergency)
-                {
-                    setPawnState(p, PawnState.ANYTHING);
-                    considerReleasingPawn(p);
-                }
-                else if (gainingImmunity)
-                {
-                    setPawnState(p, PawnState.ANYTHING);
-                    considerReleasingPawn(p);
-                }
-                else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
-                {
-                    setPawnState(p, PawnState.ANYTHING);
-                    considerReleasingPawn(p);
-                }
-                else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
-                {
-                    setPawnState(p, PawnState.ANYTHING);
-                    considerReleasingPawn(p);
-                }
-                else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
-                {
-                    if (p.needs.rest.CurLevel < REST_THRESH_LOW)
-                    {
-                        setPawnState(p, PawnState.SLEEP);
-                        considerReleasingPawn(p);
-                    }
-                    else if (p.needs.rest.GUIChangeArrow > 0)
-                    {
-                        setPawnState(p, PawnState.SLEEP);
-                        considerReleasingPawn(p);
-                    }
-                    else
-                    {
-                        setPawnState(p, PawnState.JOY);
-                        restrictPawnToPsyche(p);
-                    }
-                }
-                else if (anyoneNeedingTreatment && isDoctor)
-                {
-                    if (anyoneAwaitingTreatment)
-                    {
-                        if (!isPawnCurrentlyTreating(p))
-                        {
-                            if (!alreadyResetDoctorThisTick && p.Equals(oldestDoctor))
+                            if (!isPawnCurrentlyTreating(p))
                             {
-                                setPawnState(p, PawnState.WORK);
-                                considerReleasingPawn(p);
-                                this.doctorResetTick[p] = Find.TickManager.TicksGame;
-                                if (tryToResetPawn(p))
+                                if (!alreadyResetDoctorThisTick && p.Equals(oldestDoctor))
                                 {
-                                    alreadyResetDoctorThisTick = true;
+                                    setPawnState(p, PawnState.WORK);
+                                    considerReleasingPawn(p);
+                                    this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                                    if (tryToResetPawn(p))
+                                    {
+                                        alreadyResetDoctorThisTick = true;
+                                    }
+                                    else
+                                    {
+                                        oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                                    }
                                 }
                                 else
                                 {
-                                    oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                                    setPawnState(p, PawnState.ANYTHING);
+                                    considerReleasingPawn(p);
                                 }
                             }
                             else
@@ -576,86 +603,81 @@ namespace SmarterScheduling
                             considerReleasingPawn(p);
                         }
                     }
-                    else
+                    else if (party)
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        considerReleasingPawn(p);
+                        if (
+                            p.CurJob.def.reportString == "lying down."
+                            && !p.health.HasHediffsNeedingTendByColony()
+                            )
+                        {
+                            tryToResetPawn(p);
+                        }
+                    }
+                    else if (p.needs.rest.CurLevel < REST_THRESH_LOW)
+                    {
+                        setPawnState(p, PawnState.SLEEP);
+                        considerReleasingPawn(p);
+                    }
+                    else if (p.needs.rest.GUIChangeArrow > 0)
+                    {
+                        setPawnState(p, PawnState.SLEEP);
+                        considerReleasingPawn(p);
+                    }
+                    else if (anyoneNeedingTreatment && p.health.HasHediffsNeedingTendByColony())
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                     }
-                }
-                else if (party)
-                {
-                    setPawnState(p, PawnState.ANYTHING);
-                    considerReleasingPawn(p);
+                    //else if (pawnStates[p] == PawnState.SLEEP && !(p.needs.rest.GUIChangeArrow > 0) && p.needs.rest.CurLevel > REST_THRESH_HIGH)
+                    else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (pawnStates[p] == PawnState.JOY && p.needs.joy.CurLevel < JOY_THRESH_HIGH)
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (pawnStates[p] == PawnState.JOY && p.needs.mood.GUIChangeArrow > 0)
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (p.needs.mood.CurLevel < MOOD_THRESH_LOW)
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (p.needs.joy.CurLevel < JOY_THRESH_LOW)
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else
+                    {
+                        setPawnState(p, PawnState.WORK);
+                        considerReleasingPawn(p);
+                    }
+
                     if (
-                        p.CurJob.def.reportString == "lying down."
+                           pawnStates[p] == PawnState.JOY
+                        && p.CurJob.def.reportString == "lying down."
+                        && !(p.needs.rest.GUIChangeArrow > 0)
                         && !p.health.HasHediffsNeedingTendByColony()
-                        )
+                    )
                     {
                         tryToResetPawn(p);
                     }
-                }
-                else if (p.needs.rest.CurLevel < REST_THRESH_LOW)
-                {
-                    setPawnState(p, PawnState.SLEEP);
-                    considerReleasingPawn(p);
-                }
-                else if (p.needs.rest.GUIChangeArrow > 0)
-                {
-                    setPawnState(p, PawnState.SLEEP);
-                    considerReleasingPawn(p);
-                }
-                else if (anyoneNeedingTreatment && p.health.HasHediffsNeedingTendByColony())
-                {
-                    setPawnState(p, PawnState.ANYTHING);
-                    considerReleasingPawn(p);
-                }
-                //else if (pawnStates[p] == PawnState.SLEEP && !(p.needs.rest.GUIChangeArrow > 0) && p.needs.rest.CurLevel > REST_THRESH_HIGH)
-                else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
-                {
-                    setPawnState(p, PawnState.JOY);
-                    restrictPawnToPsyche(p);
-                }
-                else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
-                {
-                    setPawnState(p, PawnState.JOY);
-                    restrictPawnToPsyche(p);
-                }
-                else if (pawnStates[p] == PawnState.JOY && p.needs.joy.CurLevel < JOY_THRESH_HIGH)
-                {
-                    setPawnState(p, PawnState.JOY);
-                    restrictPawnToPsyche(p);
-                }
-                else if (pawnStates[p] == PawnState.JOY && p.needs.mood.GUIChangeArrow > 0)
-                {
-                    setPawnState(p, PawnState.JOY);
-                    restrictPawnToPsyche(p);
-                }
-                else if (p.needs.mood.CurLevel < MOOD_THRESH_LOW)
-                {
-                    setPawnState(p, PawnState.JOY);
-                    restrictPawnToPsyche(p);
-                }
-                else if (p.needs.joy.CurLevel < JOY_THRESH_LOW)
-                {
-                    setPawnState(p, PawnState.JOY);
-                    restrictPawnToPsyche(p);
-                }
-                else
-                {
-                    setPawnState(p, PawnState.WORK);
-                    considerReleasingPawn(p);
-                }
 
-                if (
-                       pawnStates[p] == PawnState.JOY
-                    && p.CurJob.def.reportString == "lying down."
-                    && !(p.needs.rest.GUIChangeArrow > 0)
-                    && !p.health.HasHediffsNeedingTendByColony()
-                )
-                {
-                    tryToResetPawn(p);
                 }
-
             }
         }
 
