@@ -39,7 +39,7 @@ namespace SmarterScheduling
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 2; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
