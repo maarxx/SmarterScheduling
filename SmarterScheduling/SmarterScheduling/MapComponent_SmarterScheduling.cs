@@ -456,7 +456,6 @@ namespace SmarterScheduling
 
                 foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
                 {
-
                     float MOOD_THRESH_CRITICAL = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02F;
                     float MOOD_THRESH_LOW = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02F;
                     float MOOD_THRESH_HIGH = p.mindState.mentalBreaker.BreakThresholdMinor + 0.08F;
