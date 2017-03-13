@@ -105,21 +105,21 @@ namespace SmarterScheduling
             }
             if (this.psyche == null)
             {
-                Area_Allowed newPsyche;// = new Area_Allowed(map.areaManager, AllowedAreaMode.Humanlike, PSYCHE_NAME);
+                Area_Allowed newPsyche;
                 map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newPsyche);
                 newPsyche.SetLabel(PSYCHE_NAME);
                 this.psyche = newPsyche;
             }
             if (this.humanToxic == null)
             {
-                Area_Allowed newHumanToxic;// = new Area_Allowed(map.areaManager, AllowedAreaMode.Humanlike, TOXIC_NAME_H);
+                Area_Allowed newHumanToxic;
                 map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newHumanToxic);
                 newHumanToxic.SetLabel(TOXIC_NAME_H);
                 this.humanToxic = newHumanToxic;
             }
             if (this.animalToxic == null)
             {
-                Area_Allowed newAnimalToxic;// = new Area_Allowed(map.areaManager, AllowedAreaMode.Animal, TOXIC_NAME_A);
+                Area_Allowed newAnimalToxic;
                 map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Animal, out newAnimalToxic);
                 newAnimalToxic.SetLabel(TOXIC_NAME_A);
                 this.animalToxic = newAnimalToxic;
@@ -292,25 +292,6 @@ namespace SmarterScheduling
             return map.mapConditionManager.ConditionIsActive(MapConditionDefOf.ToxicFallout);
         }
 
-        /*
-        public bool isAnyOtherGenericEmergency()
-        {
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
-            {
-                if (   p.needs.food.CurLevel == 0
-                       && (   !p.health.capacities.CanBeAwake
-                           || !(p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0)
-                           || p.health.InPainShock
-                           )
-                    )
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        */
-
         public bool tryToResetPawn(Pawn p)
         {
             if (   p.health.capacities.CanBeAwake
@@ -368,27 +349,6 @@ namespace SmarterScheduling
             }
 
         }
-
-        /*
-        public void restrictPawn(Pawn p, bool restrict)
-        {
-            if (restrict)
-            {
-                p.playerSettings.AreaRestriction = psyche;
-            }
-            else
-            {
-                p.playerSettings.AreaRestriction = lastPawnAreas[p];
-            }
-        }
-        */
-
-        /*
-        public void restrictPawn(Pawn p, Area a)
-        {
-
-        }
-        */
 
         public void restrictPawnToPsyche(Pawn p)
         {
@@ -470,8 +430,6 @@ namespace SmarterScheduling
                     this.toxicLatch = true;
                 }
 
-                //bool anyOtherGenericEmergency = isAnyOtherGenericEmergency();
-
                 bool party = isThereAParty();
 
                 if (this.toxicFallout || this.toxicLatch)
@@ -524,14 +482,6 @@ namespace SmarterScheduling
                         }
                     }
 
-                    /*
-                    if (anyOtherGenericEmergency)
-                    {
-                        setPawnState(p, PawnState.ANYTHING);
-                        considerReleasingPawn(p);
-                    }
-                    else
-                    */
                     if (gainingImmunity)
                     {
                         setPawnState(p, PawnState.ANYTHING);
