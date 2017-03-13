@@ -519,29 +519,42 @@ namespace SmarterScheduling
                         }
                         if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
-                    else if (anyoneAwaitingTreatment && isDoctor)
+                    else if (anyoneNeedingTreatment && isDoctor)
                     {
                         if (isPawnCurrentlyTreating(p))
                         {
                             this.doctorResetTick[p] = Find.TickManager.TicksGame;
-                            //setPawnState(p, PawnState.ANYTHING);
-                            //considerReleasingPawn(p);
+                            setPawnState(p, PawnState.ANYTHING);
+                            considerReleasingPawn(p);
                         }
                         else
                         {
-                            if (alreadyResetDoctorThisTick || !p.Equals(oldestDoctor))
+                            if (!anyoneAwaitingTreatment)
                             {
                                 setPawnState(p, PawnState.ANYTHING);
                                 considerReleasingPawn(p);
                             }
                             else
                             {
-                                setPawnState(p, PawnState.WORK);
-                                considerReleasingPawn(p);
-                                this.doctorResetTick[p] = Find.TickManager.TicksGame;
-                                if (tryToResetPawn(p))
+                                if (alreadyResetDoctorThisTick || !p.Equals(oldestDoctor))
                                 {
-                                    alreadyResetDoctorThisTick = true;
+                                    setPawnState(p, PawnState.ANYTHING);
+                                    considerReleasingPawn(p);
+                                }
+                                else
+                                {
+                                    setPawnState(p, PawnState.WORK);
+                                    considerReleasingPawn(p);
+
+                                    this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                                    if (tryToResetPawn(p))
+                                    {
+                                        alreadyResetDoctorThisTick = true;
+                                    }
+                                    else
+                                    {
+                                        oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                                    }
                                 }
                             }
                         }
