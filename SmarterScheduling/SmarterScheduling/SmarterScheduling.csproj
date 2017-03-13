@@ -54,7 +54,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MapComponent_Brain.cs" />
+    <Compile Include="MainTabWindow_SmarterScheduling.cs" />
+    <Compile Include="MapComponent_SmarterScheduling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
