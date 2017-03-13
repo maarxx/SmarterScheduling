@@ -515,38 +515,31 @@ namespace SmarterScheduling
                             restrictPawnToPsyche(p);
                         }
                     }
-                    else if (anyoneNeedingTreatment && isDoctor)
+                    else if (anyoneAwaitingTreatment && isDoctor)
                     {
-                        if (anyoneAwaitingTreatment)
+                        if (isPawnCurrentlyTreating(p))
                         {
-                            if (!isPawnCurrentlyTreating(p))
-                            {
-                                if (!alreadyResetDoctorThisTick && p.Equals(oldestDoctor))
-                                {
-                                    setPawnState(p, PawnState.WORK);
-                                    considerReleasingPawn(p);
-                                    if (tryToResetPawn(p))
-                                    {
-                                        alreadyResetDoctorThisTick = true;
-                                    }
-                                }
-                                else
-                                {
-                                    setPawnState(p, PawnState.ANYTHING);
-                                    considerReleasingPawn(p);
-                                }
-                            }
-                            else
-                            {
-                                this.doctorResetTick[p] = Find.TickManager.TicksGame;
-                                setPawnState(p, PawnState.ANYTHING);
-                                considerReleasingPawn(p);
-                            }
+                            this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                            setPawnState(p, PawnState.ANYTHING);
+                            //considerReleasingPawn(p);
                         }
                         else
                         {
-                            setPawnState(p, PawnState.ANYTHING);
-                            considerReleasingPawn(p);
+                            if (alreadyResetDoctorThisTick || !p.Equals(oldestDoctor))
+                            {
+                                setPawnState(p, PawnState.ANYTHING);
+                                considerReleasingPawn(p);
+                            }
+                            else
+                            {
+                                setPawnState(p, PawnState.WORK);
+                                considerReleasingPawn(p);
+                                this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                                if (tryToResetPawn(p))
+                                {
+                                    alreadyResetDoctorThisTick = true;
+                                }
+                            }
                         }
                     }
                     else if (party)
