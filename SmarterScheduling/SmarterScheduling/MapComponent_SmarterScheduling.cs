@@ -486,16 +486,19 @@ namespace SmarterScheduling
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame;  }
                     }
                     else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
                     else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
                     else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
                     {
@@ -514,17 +517,35 @@ namespace SmarterScheduling
                             setPawnState(p, PawnState.JOY);
                             restrictPawnToPsyche(p);
                         }
+                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
                     else if (anyoneNeedingTreatment && isDoctor)
                     {
-                        if (anyoneAwaitingTreatment)
+                        if (isPawnCurrentlyTreating(p))
                         {
-                            if (!isPawnCurrentlyTreating(p))
+                            this.doctorResetTick[p] = Find.TickManager.TicksGame;
+                            setPawnState(p, PawnState.ANYTHING);
+                            considerReleasingPawn(p);
+                        }
+                        else
+                        {
+                            if (!anyoneAwaitingTreatment)
                             {
-                                if (!alreadyResetDoctorThisTick && p.Equals(oldestDoctor))
+                                setPawnState(p, PawnState.ANYTHING);
+                                considerReleasingPawn(p);
+                            }
+                            else
+                            {
+                                if (alreadyResetDoctorThisTick || !p.Equals(oldestDoctor))
+                                {
+                                    setPawnState(p, PawnState.ANYTHING);
+                                    considerReleasingPawn(p);
+                                }
+                                else
                                 {
                                     setPawnState(p, PawnState.WORK);
                                     considerReleasingPawn(p);
+
                                     this.doctorResetTick[p] = Find.TickManager.TicksGame;
                                     if (tryToResetPawn(p))
                                     {
@@ -535,22 +556,7 @@ namespace SmarterScheduling
                                         oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
                                     }
                                 }
-                                else
-                                {
-                                    setPawnState(p, PawnState.ANYTHING);
-                                    considerReleasingPawn(p);
-                                }
                             }
-                            else
-                            {
-                                setPawnState(p, PawnState.ANYTHING);
-                                considerReleasingPawn(p);
-                            }
-                        }
-                        else
-                        {
-                            setPawnState(p, PawnState.ANYTHING);
-                            considerReleasingPawn(p);
                         }
                     }
                     else if (party)
