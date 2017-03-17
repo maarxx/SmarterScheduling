@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alert_SwitchedOff.cs" />
     <Compile Include="MainTabWindow_SmarterScheduling.cs" />
     <Compile Include="MapComponent_SmarterScheduling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
