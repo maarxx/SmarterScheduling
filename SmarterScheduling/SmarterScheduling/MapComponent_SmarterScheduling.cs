@@ -641,15 +641,17 @@ namespace SmarterScheduling
 
                     if (layingDown && !sleeping && !needsTreatment)
                     {
-                        if (pawnStates[p] == PawnState.JOY)
+                        if (!(gainingImmunity && immuneSensitivity))
                         {
-                            tryToResetPawn(p);
+                            if (pawnStates[p] == PawnState.JOY)
+                            {
+                                tryToResetPawn(p);
+                            }
+                            else if (!spoonFeeding && hungry)
+                            {
+                                tryToResetPawn(p);
+                            }
                         }
-                        else if (!spoonFeeding && hungry)
-                        {
-                            tryToResetPawn(p);
-                        }
-                        
                     }
 
                 }
