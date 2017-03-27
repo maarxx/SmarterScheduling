@@ -67,7 +67,7 @@ namespace SmarterScheduling
                         }
                         break;
                     case 1:
-                        buttonLabel = "Reset all Pawn Schedules to Anything";
+                        buttonLabel = "Reset All Pawn's" + Environment.NewLine + "Schedules to Anything";
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
                             component.resetAllSchedules(MapComponent_SmarterScheduling.PawnState.ANYTHING);
