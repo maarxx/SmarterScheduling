@@ -34,6 +34,7 @@ namespace SmarterScheduling
 
         public override void DoWindowContents(Rect canvas)
         {
+            Text.Font = GameFont.Small;
             base.DoWindowContents(canvas);
 
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
@@ -51,14 +52,14 @@ namespace SmarterScheduling
                 switch (i)
                 {
                     case 0:
-                        buttonLabel = "Current Enabled is: ";
+                        buttonLabel = "Entire Mod is Currently:" + Environment.NewLine;
                         if (curEnabled)
                         {
-                            buttonLabel += "ON";
+                            buttonLabel += "ENABLED";
                         }
                         else
                         {
-                            buttonLabel += "OFF";
+                            buttonLabel += "DISABLED";
                         }
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
@@ -73,14 +74,14 @@ namespace SmarterScheduling
                         }
                         break;
                     case 2:
-                        buttonLabel = "Immunity Handling is: ";
+                        buttonLabel = "Immunity Handling is:" + Environment.NewLine;
                         if (curImmuneSensitivity)
                         {
                             buttonLabel += "Sensitive";
                         }
                         else
                         {
-                            buttonLabel += "Efficient";
+                            buttonLabel += "Dangerous";
                         }
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
@@ -88,14 +89,14 @@ namespace SmarterScheduling
                         }
                         break;
                     case 3:
-                        buttonLabel = "Patient Feeding is: ";
+                        buttonLabel = "Hungry Patients should:" + Environment.NewLine;
                         if (curSpoonFeeding)
                         {
-                            buttonLabel += "Spoon Feed by Others";
+                            buttonLabel += "Wait to be Fed";
                         }
                         else
                         {
-                            buttonLabel += "Feed Your Damn Selves";
+                            buttonLabel += "Feed Themselves";
                         }
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
