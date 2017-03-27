@@ -38,8 +38,9 @@ namespace SmarterScheduling
 
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
+            bool curImmuneAlwaysAnything = component.immuneAlwaysAnything;
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
@@ -68,6 +69,21 @@ namespace SmarterScheduling
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
                             component.resetAllSchedules(MapComponent_SmarterScheduling.PawnState.ANYTHING);
+                        }
+                        break;
+                    case 2:
+                        buttonLabel = "Gaining Immunity is: ";
+                        if (curImmuneAlwaysAnything)
+                        {
+                            buttonLabel += "Always Anything";
+                        }
+                        else
+                        {
+                            buttonLabel += "Sometimes Joy or Doctor";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.immuneAlwaysAnything = !curImmuneAlwaysAnything;
                         }
                         break;
                 }
