@@ -43,6 +43,7 @@ namespace SmarterScheduling
         public int slowDown;
 
         public bool enabled;
+        public bool immuneAlwaysAnything;
 
         public bool toxicFallout;
         public bool toxicLatch;
@@ -54,7 +55,10 @@ namespace SmarterScheduling
             this.doctorResetTick = new Dictionary<Pawn, int>();
             this.toxicBounces = new Dictionary<Pawn, bool>();
             this.playerFaction = getPlayerFaction();
+
             this.enabled = false;
+            this.immuneAlwaysAnything = true;
+
             this.toxicFallout = false;
             this.toxicLatch = false;
             this.slowDown = 0;
@@ -482,7 +486,7 @@ namespace SmarterScheduling
                         }
                     }
 
-                    if (gainingImmunity)
+                    if (immuneAlwaysAnything && gainingImmunity)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
@@ -616,6 +620,11 @@ namespace SmarterScheduling
                     {
                         setPawnState(p, PawnState.JOY);
                         restrictPawnToPsyche(p);
+                    }
+                    else if (gainingImmunity)
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        considerReleasingPawn(p);
                     }
                     else
                     {
