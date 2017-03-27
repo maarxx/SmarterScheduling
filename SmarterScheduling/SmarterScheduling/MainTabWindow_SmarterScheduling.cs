@@ -38,9 +38,10 @@ namespace SmarterScheduling
 
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
-            bool curImmuneAlwaysAnything = component.immuneAlwaysAnything;
+            bool curImmuneSensitivity = component.immuneSensitivity;
+            bool curSpoonFeeding = component.spoonFeeding;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
@@ -72,18 +73,33 @@ namespace SmarterScheduling
                         }
                         break;
                     case 2:
-                        buttonLabel = "Gaining Immunity is: ";
-                        if (curImmuneAlwaysAnything)
+                        buttonLabel = "Immunity Handling is: ";
+                        if (curImmuneSensitivity)
                         {
-                            buttonLabel += "Always Anything";
+                            buttonLabel += "Sensitive";
                         }
                         else
                         {
-                            buttonLabel += "Sometimes Joy or Doctor";
+                            buttonLabel += "Efficient";
                         }
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
-                            component.immuneAlwaysAnything = !curImmuneAlwaysAnything;
+                            component.immuneSensitivity = !curImmuneSensitivity;
+                        }
+                        break;
+                    case 3:
+                        buttonLabel = "Patient Feeding is: ";
+                        if (curSpoonFeeding)
+                        {
+                            buttonLabel += "Spoon Feed by Others";
+                        }
+                        else
+                        {
+                            buttonLabel += "Feed Your Damn Selves";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.spoonFeeding = !curSpoonFeeding;
                         }
                         break;
                 }
