@@ -500,7 +500,7 @@ namespace SmarterScheduling
                     }
                     else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
                     {
-                        setPawnState(p, PawnState.ANYTHING);
+                        //setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                         if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
                     }
