@@ -17,15 +17,15 @@ namespace SmarterScheduling
             ANYTHING
         }
 
-        public const float REST_THRESH_CRITICAL   = 0.05F ;
+        public const float REST_THRESH_CRITICAL = 0.05F ;
 
-        public const float HUNGER_THRESH_CRITICAL = 0.25F ;
+        public const float HUNGER_THRESH_LOW    = 0.29F ;
 
-        public const float REST_THRESH_LOW        = 0.35F ;
-        public const float REST_THRESH_HIGH       = 0.90F ;
+        public const float REST_THRESH_LOW      = 0.35F ;
+        public const float REST_THRESH_HIGH     = 0.90F ;
 
-        public const float JOY_THRESH_LOW         = 0.28F ;
-        public const float JOY_THRESH_HIGH        = 0.90F ;
+        public const float JOY_THRESH_LOW       = 0.28F ;
+        public const float JOY_THRESH_HIGH      = 0.90F ;
 
         public const string PSYCHE_NAME = "Psyche";
         public const string TOXIC_NAME_H = "ToxicH";
@@ -43,7 +43,8 @@ namespace SmarterScheduling
         public int slowDown;
 
         public bool enabled;
-        public bool immuneAlwaysAnything;
+        public bool immuneSensitivity;
+        public bool spoonFeeding;
 
         public bool toxicFallout;
         public bool toxicLatch;
@@ -57,7 +58,8 @@ namespace SmarterScheduling
             this.playerFaction = getPlayerFaction();
 
             this.enabled = false;
-            this.immuneAlwaysAnything = true;
+            this.immuneSensitivity = true;
+            this.spoonFeeding = true;
 
             this.toxicFallout = false;
             this.toxicLatch = false;
@@ -252,16 +254,9 @@ namespace SmarterScheduling
             return false;
         }
 
-        public bool isPawnCurrentlyTreating(Pawn p)
+        public void doctorNotLazy(Pawn p)
         {
-            if (p.CurJob.def.reportString == "tending to TargetA.")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            this.doctorResetTick[p] = Find.TickManager.TicksGame;
         }
 
         public bool isPawnAnimal(Pawn p)
@@ -415,16 +410,18 @@ namespace SmarterScheduling
                 initPlayerAreas();
                 initPawnsIntoCollection();
 
+                bool party = isThereAParty();
+
                 bool anyoneNeedingTreatment = isAnyoneNeedingTreatment();
                 bool anyoneAwaitingTreatment = false;
+                Pawn laziestDoctor = null;
                 bool alreadyResetDoctorThisTick = false;
-                Pawn oldestDoctor = null;
                 if (anyoneNeedingTreatment)
                 {
                     anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
                     if (this.doctorResetTick.Count > 0)
                     {
-                        oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
+                        laziestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
                     }
                 }
 
@@ -433,8 +430,6 @@ namespace SmarterScheduling
                 {
                     this.toxicLatch = true;
                 }
-
-                bool party = isThereAParty();
 
                 if (this.toxicFallout || this.toxicLatch)
                 {
@@ -466,10 +461,22 @@ namespace SmarterScheduling
 
                     bool gainingImmunity = isPawnGainingImmunity(p);
 
+                    bool layingDown = (p.CurJob.def.reportString == "lying down.");
+                    bool sleeping = (p.needs.rest.GUIChangeArrow > 0);
+
+                    bool hungry = (p.needs.food.CurLevel < HUNGER_THRESH_LOW);
+
+                    bool tired = (p.needs.rest.CurLevel < REST_THRESH_LOW);
+                    bool exhausted = (p.needs.rest.CurLevel < REST_THRESH_CRITICAL);
+
+                    bool needsTreatment = false;
                     bool isDoctor = false;
+                    bool currentlyTreating = false;
                     if (anyoneNeedingTreatment)
                     {
+                        needsTreatment = p.health.HasHediffsNeedingTendByColony();
                         isDoctor = isPawnDoctor(p);
+                        currentlyTreating = (p.CurJob.def.reportString == "tending to TargetA.");
                         if (isDoctor)
                         {
                             if (!this.doctorResetTick.ContainsKey(p))
@@ -486,32 +493,37 @@ namespace SmarterScheduling
                         }
                     }
 
-                    if (immuneAlwaysAnything && gainingImmunity)
+                    if (immuneSensitivity && gainingImmunity)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
-                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame;  }
+                        if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                     }
-                    else if (p.needs.rest.CurLevel < REST_THRESH_CRITICAL)
+                    else if (exhausted)
                     {
-                        setPawnState(p, PawnState.ANYTHING);
+                        setPawnState(p, PawnState.SLEEP);
                         considerReleasingPawn(p);
-                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
+                        if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                     }
-                    else if (p.needs.food.CurLevel < HUNGER_THRESH_CRITICAL && !(p.needs.rest.GUIChangeArrow > 0))
+                    else if (hungry && !sleeping)
                     {
                         //setPawnState(p, PawnState.ANYTHING);
+                        for (int i = 0; i < 24; i++)
+                        {
+                            p.timetable.SetAssignment(i, TimeAssignmentDefOf.Anything);
+                        }
+
                         considerReleasingPawn(p);
-                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
+                        if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                     }
                     else if (p.needs.mood.CurLevel < MOOD_THRESH_CRITICAL)
                     {
-                        if (p.needs.rest.CurLevel < REST_THRESH_LOW)
+                        if (tired)
                         {
                             setPawnState(p, PawnState.SLEEP);
                             considerReleasingPawn(p);
                         }
-                        else if (p.needs.rest.GUIChangeArrow > 0)
+                        else if (sleeping)
                         {
                             setPawnState(p, PawnState.SLEEP);
                             considerReleasingPawn(p);
@@ -521,15 +533,15 @@ namespace SmarterScheduling
                             setPawnState(p, PawnState.JOY);
                             restrictPawnToPsyche(p);
                         }
-                        if (anyoneAwaitingTreatment && isDoctor) { this.doctorResetTick[p] = Find.TickManager.TicksGame; }
+                        if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                     }
                     else if (anyoneNeedingTreatment && isDoctor)
                     {
-                        if (isPawnCurrentlyTreating(p))
+                        if (currentlyTreating)
                         {
-                            this.doctorResetTick[p] = Find.TickManager.TicksGame;
                             setPawnState(p, PawnState.ANYTHING);
                             considerReleasingPawn(p);
+                            doctorNotLazy(p);
                         }
                         else
                         {
@@ -540,7 +552,7 @@ namespace SmarterScheduling
                             }
                             else
                             {
-                                if (alreadyResetDoctorThisTick || !p.Equals(oldestDoctor))
+                                if (alreadyResetDoctorThisTick || !p.Equals(laziestDoctor))
                                 {
                                     setPawnState(p, PawnState.ANYTHING);
                                     considerReleasingPawn(p);
@@ -550,15 +562,11 @@ namespace SmarterScheduling
                                     setPawnState(p, PawnState.WORK);
                                     considerReleasingPawn(p);
 
-                                    this.doctorResetTick[p] = Find.TickManager.TicksGame;
                                     if (tryToResetPawn(p))
                                     {
                                         alreadyResetDoctorThisTick = true;
                                     }
-                                    else
-                                    {
-                                        oldestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
-                                    }
+                                    doctorNotLazy(p);
                                 }
                             }
                         }
@@ -567,34 +575,28 @@ namespace SmarterScheduling
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
-                        if (
-                            p.CurJob.def.reportString == "lying down."
-                            && !p.health.HasHediffsNeedingTendByColony()
-                            )
+                        if (layingDown && !needsTreatment)
                         {
-                            tryToResetPawn(p);
+                            if ( !(gainingImmunity && immuneSensitivity) )
+                            {
+                                tryToResetPawn(p);
+                            }
                         }
                     }
-                    else if (p.needs.rest.CurLevel < REST_THRESH_LOW)
+                    else if (tired)
                     {
                         setPawnState(p, PawnState.SLEEP);
                         considerReleasingPawn(p);
                     }
-                    else if (p.needs.rest.GUIChangeArrow > 0)
+                    else if (sleeping)
                     {
                         setPawnState(p, PawnState.SLEEP);
                         considerReleasingPawn(p);
                     }
-                    else if (anyoneNeedingTreatment && p.health.HasHediffsNeedingTendByColony())
+                    else if (needsTreatment)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
-                    }
-                    //else if (pawnStates[p] == PawnState.SLEEP && !(p.needs.rest.GUIChangeArrow > 0) && p.needs.rest.CurLevel > REST_THRESH_HIGH)
-                    else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
-                    {
-                        setPawnState(p, PawnState.JOY);
-                        restrictPawnToPsyche(p);
                     }
                     else if (pawnStates[p] == PawnState.JOY && p.needs.mood.CurLevel < MOOD_THRESH_HIGH)
                     {
@@ -626,20 +628,30 @@ namespace SmarterScheduling
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                     }
+                    else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
                     else
                     {
                         setPawnState(p, PawnState.WORK);
                         considerReleasingPawn(p);
                     }
 
-                    if (
-                           pawnStates[p] == PawnState.JOY
-                        && p.CurJob.def.reportString == "lying down."
-                        && !(p.needs.rest.GUIChangeArrow > 0)
-                        && !p.health.HasHediffsNeedingTendByColony()
-                    )
+                    if (layingDown && !sleeping && !needsTreatment)
                     {
-                        tryToResetPawn(p);
+                        if (!(gainingImmunity && immuneSensitivity))
+                        {
+                            if (pawnStates[p] == PawnState.JOY)
+                            {
+                                tryToResetPawn(p);
+                            }
+                            else if (!spoonFeeding && hungry)
+                            {
+                                tryToResetPawn(p);
+                            }
+                        }
                     }
 
                 }
