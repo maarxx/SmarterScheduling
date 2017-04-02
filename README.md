@@ -51,8 +51,6 @@ This mod implements exactly that behavior we all want. Automatically.
 
 You'll add the mod. You'll enable the mod. By default, it won't do anything. That's okay.
 
-It might only work on new games, because it adds a Map Component, and because I really don't know.
-
 Within the game, it adds a MainTab, probably in the far-bottom-right-corner, labeled "SmarterScheduling", with a button to turn the whole thing ON or OFF.
 
 You'll probably want to turn this one ON for most of the time. You might turn it OFF during real emergencies, but then you'll probably turn it back ON after the crisis has been addressed.
