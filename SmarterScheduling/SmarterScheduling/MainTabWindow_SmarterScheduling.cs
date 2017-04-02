@@ -34,7 +34,6 @@ namespace SmarterScheduling
 
         public override void DoWindowContents(Rect canvas)
         {
-            Text.Font = GameFont.Small;
             base.DoWindowContents(canvas);
 
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
@@ -42,6 +41,7 @@ namespace SmarterScheduling
             bool curImmuneSensitivity = component.immuneSensitivity;
             bool curSpoonFeeding = component.spoonFeeding;
 
+            Text.Font = GameFont.Small;
             for (int i = 0; i < 4; i++)
             {
                 Rect nextButton = new Rect(canvas);

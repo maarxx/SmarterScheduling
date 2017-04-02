@@ -66,6 +66,18 @@ namespace SmarterScheduling
             this.slowDown = 0;
             //initPlayerAreas();
             //initPawnsIntoCollection();
+            LongEventHandler.QueueLongEvent(ensureComponentExists, null, false, null);
+        }
+
+        public static void ensureComponentExists()
+        {
+            foreach (Map m in Find.Maps)
+            {
+                if (m.GetComponent<MapComponent_SmarterScheduling>() == null)
+                {
+                    m.components.Add(new MapComponent_SmarterScheduling(m));
+                }
+            }
         }
 
         public void initPlayerAreas()
