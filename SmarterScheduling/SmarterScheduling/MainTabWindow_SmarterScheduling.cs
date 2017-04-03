@@ -38,8 +38,11 @@ namespace SmarterScheduling
 
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
+            bool curImmuneSensitivity = component.immuneSensitivity;
+            bool curSpoonFeeding = component.spoonFeeding;
 
-            for (int i = 0; i < 2; i++)
+            Text.Font = GameFont.Small;
+            for (int i = 0; i < 4; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
@@ -49,14 +52,14 @@ namespace SmarterScheduling
                 switch (i)
                 {
                     case 0:
-                        buttonLabel = "Current Enabled is: ";
+                        buttonLabel = "Entire Mod is Currently:" + Environment.NewLine;
                         if (curEnabled)
                         {
-                            buttonLabel += "ON";
+                            buttonLabel += "ENABLED";
                         }
                         else
                         {
-                            buttonLabel += "OFF";
+                            buttonLabel += "DISABLED";
                         }
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
@@ -64,10 +67,40 @@ namespace SmarterScheduling
                         }
                         break;
                     case 1:
-                        buttonLabel = "Reset all Pawn Schedules to Anything";
+                        buttonLabel = "Reset All Pawn's" + Environment.NewLine + "Schedules to Anything";
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
                             component.resetAllSchedules(MapComponent_SmarterScheduling.PawnState.ANYTHING);
+                        }
+                        break;
+                    case 2:
+                        buttonLabel = "Immunity Handling is:" + Environment.NewLine;
+                        if (curImmuneSensitivity)
+                        {
+                            buttonLabel += "Sensitive";
+                        }
+                        else
+                        {
+                            buttonLabel += "Dangerous";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.immuneSensitivity = !curImmuneSensitivity;
+                        }
+                        break;
+                    case 3:
+                        buttonLabel = "Hungry Patients should:" + Environment.NewLine;
+                        if (curSpoonFeeding)
+                        {
+                            buttonLabel += "Wait to be Fed";
+                        }
+                        else
+                        {
+                            buttonLabel += "Feed Themselves";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.spoonFeeding = !curSpoonFeeding;
                         }
                         break;
                 }

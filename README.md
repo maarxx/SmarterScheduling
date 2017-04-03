@@ -51,8 +51,6 @@ This mod implements exactly that behavior we all want. Automatically.
 
 You'll add the mod. You'll enable the mod. By default, it won't do anything. That's okay.
 
-It might only work on new games, because it adds a Map Component, and because I really don't know.
-
 Within the game, it adds a MainTab, probably in the far-bottom-right-corner, labeled "SmarterScheduling", with a button to turn the whole thing ON or OFF.
 
 You'll probably want to turn this one ON for most of the time. You might turn it OFF during real emergencies, but then you'll probably turn it back ON after the crisis has been addressed.
@@ -87,14 +85,6 @@ Pawns in Psyche might refuse to sit down and maximize their Comfort. I suggest k
 
 Since we are taking responsibility for controlling a pawn's Sleep, Joy, and Work schedules, and changing their Allowed Area, we therefore inherit the responsibility to perform a couple additional tasks with this mod.
 
-#### Doctoring
-
-It would be irresponsible to send all of your Doctors to Sleep or Joy while somebody needs medical treatment. Therefore, we also take responsibility of knowing whether any pawns require medical treatment, and which pawns are doctors.
-
-While somebody needs medical treatment, all doctors are set to schedule of "Anything". If somebody is laying down and waiting to be treated, if they are still not receiving medical treatment, the mod will start selecting doctors and forcing them into "Work" until everybody gets treatment. If they are STILL not getting medical treatment, the mod will start "Resetting" your doctors, which is the equivalent of Drafting-and-Undrafting them to reset their AI and consider a new task.
-
-As a side effect of this, you will notice that your doctor's response times have improved, and pawns overall receive medical treatment in a much quicker and snappier fashion, possibly even improving disease survival rates.
-
 #### Party
 
 The mod knows whether there is a Party being thrown, and will set all Pawns to "Anything" for the duration of the Party.
@@ -114,6 +104,38 @@ For humans, this is probably your entire base, under one large roof.
 For animals, it can be a smaller section of base, or even a separate barn, or anything under a roof. You should probably make sure there's some food there.
 
 Pawns will be restricted to these areas when their Toxic Buildup is above 35%, and they will be released when it drops below 25%.
+
+#### Doctoring
+
+It would be irresponsible to send all of your Doctors to Sleep or Joy while somebody needs medical treatment. Therefore, we also take responsibility of knowing whether any pawns require medical treatment, and which pawns are doctors.
+
+While somebody needs medical treatment, all doctors are set to schedule of "Anything". If somebody is laying down and waiting to be treated, if they are still not receiving medical treatment, the mod will start selecting doctors and forcing them into "Work" until everybody gets treatment. If they are STILL not getting medical treatment, the mod will start "Resetting" your doctors, which is the equivalent of Drafting-and-Undrafting them to reset their AI and consider a new task.
+
+As a side effect of this, you will notice that your doctor's response times have improved, and pawns overall receive medical treatment in a much quicker and snappier fashion, possibly even improving disease survival rates.
+
+This mod also assumes that your doctors have doctoring as their highest relevant priority. If you have something as a higher priority, the mod will get confused as to why nobody is providing treatment, and start chain-resetting your doctors. This is typically indicative of an incorrect work tab, anyway.
+
+#### Medical Conditions Not Requiring Treatment
+
+An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
+
+These conditions are very disruptive to your colony. Your pawn lays in bed, and does nothing, and furthermore disrupts other colonists to feed them. Sometimes, you want this, especially with Immunity, but sometimes, they need to get their asses out of bed every now and then, to feed themselves, or go to Psyche for Joy and Mood before they suffer a mental break.
+
+Therefore, the mod provides two more options for how such cases should be handled:
+
+* Immunity Handling: "Sensitive" or "Dangerous".
+
+In "Sensitive" mode, which is default behavior, we never drag a colonist out of bed who is gaining Immunity, regardless of Hunger or Mood.
+
+In "Dangerous" mode, we'll sometimes drag a colonist out of bed who is gaining Immunity. Use this when you are well-established with good Hospital Beds and Medicine and Penoxy and everybody's Immunity has a 30% lead for their Flu and you just want them to stop being little sissies.
+
+* Hungry Patients: "Wait to be Fed" or "Feed Themselves"
+
+In "Wait to be Fed", which is the default behavior, any colonist resting in bed will wait for somebody else to feed them.
+
+In "Feed Themselves" mode, if a colonist is resting in bed, and gets hungry, we will drag them out of bed, at which point they will feed themselves. They might go right back to bed after eating. Whatever.
+
+The setting "Hungry Patients" is dependent upon setting for "Immunity Handling", when relevant. If Hungry Patients is "Feed Themselves" but Immunity Handling is "Sensitive", then patients only resting for missing health will feed themselves, but patients resting for immunity will wait to be fed.
 
 # Advanced Details
 
