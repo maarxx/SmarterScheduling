@@ -28,17 +28,12 @@ namespace SmarterScheduling
         public const float JOY_THRESH_HIGH      = 0.90F ;
 
         public const string PSYCHE_NAME = "Psyche";
-        public const string TOXIC_NAME_H = "ToxicH";
-        public const string TOXIC_NAME_A = "ToxicA";
 
         public Dictionary<Pawn, PawnState> pawnStates;
         public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorResetTick;
-        public Dictionary<Pawn, bool> toxicBounces;
-        public Faction playerFaction;
-        public Area psyche;
-        public Area humanToxic;
-        public Area animalToxic;
+
+        public Area psyche; 
 
         public int slowDown;
 
@@ -46,23 +41,16 @@ namespace SmarterScheduling
         public bool immuneSensitivity;
         public bool spoonFeeding;
 
-        public bool toxicFallout;
-        public bool toxicLatch;
-
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorResetTick = new Dictionary<Pawn, int>();
-            this.toxicBounces = new Dictionary<Pawn, bool>();
-            this.playerFaction = getPlayerFaction();
 
             this.enabled = false;
             this.immuneSensitivity = true;
             this.spoonFeeding = true;
 
-            this.toxicFallout = false;
-            this.toxicLatch = false;
             this.slowDown = 0;
             //initPlayerAreas();
             //initPawnsIntoCollection();
@@ -83,8 +71,6 @@ namespace SmarterScheduling
         public void initPlayerAreas()
         {
             this.psyche = null;
-            this.humanToxic = null;
-            this.animalToxic = null;
             foreach (Area a in map.areaManager.AllAreas)
             {
                 if (a.ToString() == PSYCHE_NAME)
@@ -98,28 +84,6 @@ namespace SmarterScheduling
                         a.SetLabel(PSYCHE_NAME + "2");
                     }
                 }
-                else if (a.ToString() == TOXIC_NAME_H)
-                {
-                    if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
-                    {
-                        this.humanToxic = a;
-                    }
-                    else
-                    {
-                        a.SetLabel(TOXIC_NAME_H + "2");
-                    }
-                }
-                else if (a.ToString() == TOXIC_NAME_A)
-                {
-                    if (a.AssignableAsAllowed(AllowedAreaMode.Animal))
-                    {
-                        this.animalToxic = a;
-                    }
-                    else
-                    {
-                        a.SetLabel(TOXIC_NAME_A + "2");
-                    }
-                }
             }
             if (this.psyche == null)
             {
@@ -128,62 +92,26 @@ namespace SmarterScheduling
                 newPsyche.SetLabel(PSYCHE_NAME);
                 this.psyche = newPsyche;
             }
-            if (this.humanToxic == null)
-            {
-                Area_Allowed newHumanToxic;
-                map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newHumanToxic);
-                newHumanToxic.SetLabel(TOXIC_NAME_H);
-                this.humanToxic = newHumanToxic;
-            }
-            if (this.animalToxic == null)
-            {
-                Area_Allowed newAnimalToxic;
-                map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Animal, out newAnimalToxic);
-                newAnimalToxic.SetLabel(TOXIC_NAME_A);
-                this.animalToxic = newAnimalToxic;
-            }
         }
 
         public void initPawnsIntoCollection()
         {
-            foreach (Pawn p in map.mapPawns.PawnsInFaction(this.playerFaction))
+            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
                 if (!lastPawnAreas.ContainsKey(p))
                 {
                     lastPawnAreas.Add(p, null);
                 }
-                if (!toxicBounces.ContainsKey(p))
-                {
-                    toxicBounces.Add(p, false);
-                }
                 Area curPawnArea = p.playerSettings.AreaRestriction;
-                if (curPawnArea == null
-                    || (curPawnArea != psyche
-                        && curPawnArea != humanToxic
-                        && curPawnArea != animalToxic
-                        )
-                    )
+                if (curPawnArea == null || curPawnArea != psyche)
                 {
                     lastPawnAreas[p] = curPawnArea;
                 }
-            }
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
-            {
                 if (!pawnStates.ContainsKey(p))
                 {
                     pawnStates.Add(p, PawnState.ANYTHING);
                 }
             }
-        }
-
-        public Faction getPlayerFaction()
-        {
-            Faction playerFaction = Find.FactionManager.FirstFactionOfDef(FactionDefOf.PlayerColony);
-            if (playerFaction == null)
-            {
-                playerFaction = Find.FactionManager.FirstFactionOfDef(FactionDefOf.PlayerTribe);
-            }
-            return playerFaction;
         }
 
         public bool isAnyoneNeedingTreatment()
@@ -208,7 +136,7 @@ namespace SmarterScheduling
                     && p.CurJob.def.reportString == "lying down."
                     && p.CurJob.targetA.Thing != null
                     && !p.pather.Moving
-                    && !map.reservationManager.IsReserved(p, this.playerFaction)
+                    && !map.reservationManager.IsReserved(p, Faction.OfPlayer)
                     )
                 {
                     return true;
@@ -271,23 +199,11 @@ namespace SmarterScheduling
             this.doctorResetTick[p] = Find.TickManager.TicksGame;
         }
 
-        public bool isPawnAnimal(Pawn p)
-        {
-            if (p.needs.joy == null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public bool isThereAParty()
         {
             foreach (Lord l in map.lordManager.lords)
             {
-                if (l.faction == this.playerFaction)
+                if (l.faction == Faction.OfPlayer)
                 {
                     if (l.LordJob != null && l.LordJob is LordJob_Joinable_Party)
                     {
@@ -296,11 +212,6 @@ namespace SmarterScheduling
                 }
             }
             return false;
-        }
-
-        public bool isToxicFallout()
-        {
-            return map.mapConditionManager.ConditionIsActive(MapConditionDefOf.ToxicFallout);
         }
 
         public bool tryToResetPawn(Pawn p)
@@ -368,41 +279,7 @@ namespace SmarterScheduling
 
         public void considerReleasingPawn(Pawn p)
         {
-            if (this.toxicFallout)
-            {
-                foreach (Hediff h in p.health.hediffSet.hediffs)
-                {
-                    if (h.def.Equals(HediffDefOf.ToxicBuildup)) {
-                        if (h.Severity < 0.25F)
-                        {
-                            this.toxicBounces[p] = false;
-                            p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
-                            return;
-                        }
-                        else if (h.Severity > 0.35F || this.toxicBounces[p])
-                        {
-                            this.toxicBounces[p] = true;
-                            if (isPawnAnimal(p))
-                            {
-                                p.playerSettings.AreaRestriction = this.animalToxic;
-                                return;
-                            }
-                            else
-                            {
-                                p.playerSettings.AreaRestriction = this.humanToxic;
-                                return;
-                            }
-                        }
-                    }
-                }
-                this.toxicBounces[p] = false;
-                p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
-                return;
-            }
-            else
-            {
-                p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
-            }
+            p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
         }
 
         public override void MapComponentTick()
@@ -434,34 +311,6 @@ namespace SmarterScheduling
                     if (this.doctorResetTick.Count > 0)
                     {
                         laziestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
-                    }
-                }
-
-                this.toxicFallout = isToxicFallout();
-                if (this.toxicFallout)
-                {
-                    this.toxicLatch = true;
-                }
-
-                if (this.toxicFallout || this.toxicLatch)
-                {
-                    foreach (Pawn p in map.mapPawns.PawnsInFaction(this.playerFaction))
-                    {
-                        if (isPawnAnimal(p))
-                        {
-                            if (toxicFallout)
-                            {
-                                considerReleasingPawn(p);
-                            }
-                            else
-                            {
-                                p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
-                            }
-                        }
-                    }
-                    if (this.toxicFallout == false)
-                    {
-                        this.toxicLatch = false;
                     }
                 }
 
