@@ -91,20 +91,6 @@ The mod knows whether there is a Party being thrown, and will set all Pawns to "
 
 If they are sleeping through the Party, the mod will automatically wake them up.
 
-#### Toxic Fallout
-
-While we're at it, since we are taking responsibility to manage pawn's Schedules and Allowed Areas, the mod also automatically manages the tedious micromanagement required during Toxic Fallout.
-
-You'll notice two additional Allowed Areas, "ToxicH" and "ToxicA", one for humans and one for animals, respectively.
-
-You should update these areas to be under roofs, and they represent where pawns should go if their Toxic Buildup gets too high.
-
-For humans, this is probably your entire base, under one large roof.
-
-For animals, it can be a smaller section of base, or even a separate barn, or anything under a roof. You should probably make sure there's some food there.
-
-Pawns will be restricted to these areas when their Toxic Buildup is above 35%, and they will be released when it drops below 25%.
-
 #### Doctoring
 
 It would be irresponsible to send all of your Doctors to Sleep or Joy while somebody needs medical treatment. Therefore, we also take responsibility of knowing whether any pawns require medical treatment, and which pawns are doctors.
