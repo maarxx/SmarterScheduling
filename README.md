@@ -61,7 +61,7 @@ While it is ON, the mod will automatically manage each pawn's Sleep / Joy / Work
 
 The mod doesn't care what time it is, and doesn't worry about future scheduling -- it updates each pawn's whole schedule block to one uniform task/color, and then constantly changes it on the fly.
 
-The mod will create a couple Allowable Areas: one called "Psyche" for humans, and two called "ToxicH" and "ToxicA", for humans and animals, respectively.
+The mod will create an Allowable Areas for humans called "Psyche".
 
 As soon as you have a good Recreation / Dining room, which provides excellent mood scores, you'll want to update the "Psyche" area to just that room. If you don't have this room yet, just leave the "Psyche" area empty / undefined.
 
@@ -69,7 +69,7 @@ The cycle you'll see looks something like this:
 
 * The pawn will be sent to Sleep when they are tired.
 * When they wake, they will probably be critically hungry, so the pawn will set them to Anything for a moment while they eat.
-* Once they're fed, the pawn will set them to Joy, and will restrict them to Psyche that you've specified.
+* Once they're fed, the mod will set them to Joy, and will restrict them to Psyche that you've specified.
 * The pawn will be held in Psyche for Joy, not just until their Joy is maximized, but until their Beauty, Comfort, Space, and overall Mood is maximized.
 * Then it will set them to Work, and release them from Psyche, back to whatever Area you had previously set.
 
@@ -79,7 +79,7 @@ Ideally, your pawn will stay out until Rest gets low, and then the mod will send
 
 If the pawn's Joy or Mood gets critically low while they are out in the field, the mod will send them back to Psyche early, for another round of mood-increasing therapy.
 
-Pawns in Psyche might refuse to sit down and maximize their Comfort. I suggest keeping a workbench in the room with a filler task, and a comfortable chair, and available ingredients. I personally use stonecutting. I keep enough Beauty in my room to offset keeping some ugly stone chunks in the room. Another good option is smelting.
+Pawns in Psyche might refuse to sit down and maximize their Comfort. I suggest keeping a workbench in the room with a filler task, and a comfortable chair, and available ingredients. I personally use stonecutting. I keep enough Beauty in my room to offset keeping some ugly stone chunks in the room. Another good option is smelting. Or rolling smokeleaf.
 
 # Specific Additional Features
 
@@ -105,7 +105,7 @@ This mod also assumes that your doctors have doctoring as their highest relevant
 
 An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
 
-These conditions are very disruptive to your colony. Your pawn lays in bed, and does nothing, and furthermore disrupts other colonists to feed them. Sometimes, you want this, especially with Immunity, but sometimes, they need to get their asses out of bed every now and then, to feed themselves, or go to Psyche for Joy and Mood before they suffer a mental break.
+These conditions are very disruptive to your colony. Your pawn lays in bed, and does nothing, and furthermore disrupts other colonists to feed them. Sometimes, you want this, especially with Immunity, but sometimes, they need to get their asses out of bed every now and then, to feed themselves, or go to Psyche for Joy and Mood before they suffer a mental break in your Hospital or Dormitory.
 
 Therefore, the mod provides two more options for how such cases should be handled:
 
@@ -113,7 +113,7 @@ Therefore, the mod provides two more options for how such cases should be handle
 
 In "Sensitive" mode, which is default behavior, we never drag a colonist out of bed who is gaining Immunity, regardless of Hunger or Mood.
 
-In "Dangerous" mode, we'll sometimes drag a colonist out of bed who is gaining Immunity. Use this when you are well-established with good Hospital Beds and Medicine and Penoxy and everybody's Immunity has a 30% lead for their Flu and you just want them to stop being little sissies.
+In "Dangerous" mode, we'll sometimes drag a colonist out of bed who is gaining Immunity. Use this when you are well-established with good Hospital Beds and Medicine and Penoxy and everybody's Immunity has a 30% lead for their Flu and you just want them to stop being little sissies and at the very least take care of themselves and not suffer a mental break.
 
 * Hungry Patients: "Wait to be Fed" or "Feed Themselves"
 
@@ -127,7 +127,7 @@ The setting "Hungry Patients" is dependent upon setting for "Immunity Handling",
 
 #### Really Bad Moods, like Addiction Withdrawl
 
-If a pawn is having a really bad time, because their dog died, or they had to butcher their wife, or something, then instead of Mental Breaks, you'll see the mod simply adjusts automatically, holding them in Psyche more frequently, for longer periods of time, trying to keep them sane.
+If a pawn is having a really bad time, because their dog died, or they had to butcher their wife, or something, then instead of mental breaks, you'll see the mod simply adjusts automatically, holding them in Psyche more frequently, for longer periods of time, trying to keep them sane.
 
 I think we can all agree that a pawn staying longer in your Recreation Room is better than a pawn that's gone Berserk.
 
