@@ -217,16 +217,4 @@ If it's not there, look to the right-hand-side, click the green button "New issu
 
 #### Credits
 
-Credit is due to [FluffierThanThou](https://github.com/FluffierThanThou?tab=repositories), although he doesn't even know it.
-
-I had absolutely no idea how to write a RimWorld mod, and whenever I needed a hint, I used his code as a reference.
-
-You should check out his other mods! They are awesome, and I use many of them!
-
-Credit is also due to Zorba, who also writes awesome mods. I don't know if I've read Zorba's source code, but Zorba helped fix some of the game's other shortcomings, keeping the game fun for me, certainly long enough for me to write this mod.
-
-#### Call for Contributors
-
-This mod needs a user interface, and the thresholds should be configurable in-game through some slider bars. I don't know how to do any of this.
-
-Even better would be if the thresholds were configurable per-pawn. If you are willing to write the interface for this, let me know, and I will write a fork with the back-end support.
+I started without any idea how to write a RimWorld mod. When I needed reference, I looked at code from other people's mods. Therefore a corresponding "Thank You!" is owed to the entire RimWorld modding community, but especially to Fluffy and Zorba and RawCode and JamesTec.
