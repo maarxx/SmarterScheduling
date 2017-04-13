@@ -38,8 +38,14 @@ namespace SmarterScheduling
 
             MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
-            bool curImmuneSensitivity = component.immuneSensitivity;
+            MapComponent_SmarterScheduling.ImmuneSensitivity curImmuneSensitivity = component.immuneSensitivity;
             bool curSpoonFeeding = component.spoonFeeding;
+
+            List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
+            foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
+            {
+                menuImmuneSensitivty.Add(new FloatMenuOption(immSen.ToString().ToLower().CapitalizeFirst(), delegate { component.immuneSensitivity = immSen; }));
+            }     
 
             Text.Font = GameFont.Small;
             for (int i = 0; i < 4; i++)
@@ -74,18 +80,10 @@ namespace SmarterScheduling
                         }
                         break;
                     case 2:
-                        buttonLabel = "Immunity Handling is:" + Environment.NewLine;
-                        if (curImmuneSensitivity)
-                        {
-                            buttonLabel += "Sensitive";
-                        }
-                        else
-                        {
-                            buttonLabel += "Dangerous";
-                        }
+                        buttonLabel = "Immunity Handling is:" + Environment.NewLine + curImmuneSensitivity.ToString().ToLower().CapitalizeFirst();
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
-                            component.immuneSensitivity = !curImmuneSensitivity;
+                            Find.WindowStack.Add(new FloatMenu(menuImmuneSensitivty));
                         }
                         break;
                     case 3:

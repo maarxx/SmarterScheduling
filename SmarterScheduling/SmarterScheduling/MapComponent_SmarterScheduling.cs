@@ -17,6 +17,13 @@ namespace SmarterScheduling
             ANYTHING
         }
 
+        public enum ImmuneSensitivity
+        {
+            SENSITIVE,
+            BALANCED,
+            BRUTAL
+        }
+
         public const float REST_THRESH_CRITICAL = 0.05F ;
 
         public const float HUNGER_THRESH_LOW    = 0.29F ;
@@ -38,7 +45,7 @@ namespace SmarterScheduling
         public int slowDown;
 
         public bool enabled;
-        public bool immuneSensitivity;
+        public ImmuneSensitivity immuneSensitivity;
         public bool spoonFeeding;
 
         public MapComponent_SmarterScheduling(Map map) : base(map)
@@ -48,7 +55,7 @@ namespace SmarterScheduling
             this.doctorResetTick = new Dictionary<Pawn, int>();
 
             this.enabled = false;
-            this.immuneSensitivity = true;
+            this.immuneSensitivity = ImmuneSensitivity.SENSITIVE;
             this.spoonFeeding = true;
 
             this.slowDown = 0;
@@ -354,7 +361,7 @@ namespace SmarterScheduling
                         }
                     }
 
-                    if (immuneSensitivity && gainingImmunity)
+                    if (gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
@@ -438,7 +445,7 @@ namespace SmarterScheduling
                         considerReleasingPawn(p);
                         if (layingDown && !needsTreatment)
                         {
-                            if ( !(gainingImmunity && immuneSensitivity) )
+                            if ( !(gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE) )
                             {
                                 tryToResetPawn(p);
                             }
@@ -484,7 +491,7 @@ namespace SmarterScheduling
                         setPawnState(p, PawnState.JOY);
                         restrictPawnToPsyche(p);
                     }
-                    else if (gainingImmunity)
+                    else if (gainingImmunity && ( immuneSensitivity == ImmuneSensitivity.SENSITIVE || immuneSensitivity == ImmuneSensitivity.BALANCED) )
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
@@ -502,7 +509,7 @@ namespace SmarterScheduling
 
                     if (layingDown && !sleeping && !needsTreatment)
                     {
-                        if (!(gainingImmunity && immuneSensitivity))
+                        if (!(gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE))
                         {
                             if (pawnStates[p] == PawnState.JOY)
                             {

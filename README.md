@@ -70,7 +70,7 @@ As soon as you have a good Recreation / Dining room, which provides excellent mo
 The cycle you'll see looks something like this:
 
 * The pawn will be sent to Sleep when they are tired.
-* When they wake, they will probably be critically hungry, so the pawn will set them to Anything for a moment while they eat.
+* When they wake, they will probably be critically hungry, so the pawn will be set to Anything for a moment while they eat.
 * Once they're fed, the mod will set them to Joy, and will restrict them to Psyche that you've specified.
 * The pawn will be held in Psyche for Joy, not just until their Joy is maximized, but until their Beauty, Comfort, Space, and overall Mood is maximized.
 * Then it will set them to Work, and release them from Psyche, back to whatever Area you had previously set.
@@ -111,11 +111,15 @@ These conditions are very disruptive to your colony. Your pawn lays in bed, and 
 
 Therefore, the mod provides two more options for how such cases should be handled:
 
-* Immunity Handling: "Sensitive" or "Dangerous".
+* Immunity Handling: "Sensitive" or "Balanced" or "Brutal".
 
-In "Sensitive" mode, which is default behavior, we never drag a colonist out of bed who is gaining Immunity, regardless of Hunger or Mood.
+In "Sensitive" mode, which is default behavior, any colonist who is gaining Immunity will be set to Schedule of "Anything", under which schedule they typically go rest in bed. We never drag such a colonist out of bed, regardless of Hunger or Mood.
 
-In "Dangerous" mode, we'll sometimes drag a colonist out of bed who is gaining Immunity. Use this when you are well-established with good Hospital Beds and Medicine and Penoxy and everybody's Immunity has a 30% lead for their Flu and you just want them to stop being little sissies and at the very least take care of themselves and not suffer a mental break.
+In "Balanced" mode, we will drag a colonist out of bed to attend a Party, or to send them to Psyche for low Mood or Joy, or possibly to feed themselves, based upon the next setting described below.
+
+In "Brutal" mode, we completely disregard their need for Immunity, and we send them to Sleep or to Joy or to Work like any other colonist.
+
+Note that in any mode you can exempt a particular colonist by right-clicking on a bed and manually ordering priority job: "Rest Until Healed", which the mod will never interfere with.
 
 * Hungry Patients: "Wait to be Fed" or "Feed Themselves"
 
