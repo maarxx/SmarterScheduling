@@ -87,13 +87,13 @@ Pawns in Psyche might refuse to sit down and maximize their Comfort. I suggest k
 
 Since we are taking responsibility for controlling a pawn's Sleep, Joy, and Work schedules, and changing their Allowed Area, we therefore inherit the responsibility to perform a couple additional tasks with this mod.
 
-#### Party
+## Party
 
 The mod knows whether there is a Party being thrown, and will set all Pawns to "Anything" for the duration of the Party.
 
 If they are sleeping through the Party, the mod will automatically wake them up.
 
-#### Doctoring
+## Doctoring
 
 It would be irresponsible to send all of your Doctors to Sleep or Joy while somebody needs medical treatment. Therefore, we also take responsibility of knowing whether any pawns require medical treatment, and which pawns are doctors.
 
@@ -103,7 +103,7 @@ As a side effect of this, you will notice that your doctor's response times have
 
 This mod also assumes that your doctors have doctoring as their highest relevant priority. If you have something as a higher priority, the mod will get confused as to why nobody is providing treatment, and start chain-resetting your doctors. This is typically indicative of an incorrect work tab, anyway.
 
-#### Medical Conditions Not Requiring Treatment
+## Medical Conditions Not Requiring Treatment
 
 An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
 
@@ -111,7 +111,7 @@ These conditions are very disruptive to your colony. Your pawn lays in bed, and 
 
 Therefore, the mod provides two more options for how such cases should be handled:
 
-* Immunity Handling: "Sensitive" or "Balanced" or "Brutal".
+#### Immunity Handling: "Sensitive" or "Balanced" or "Brutal".
 
 In "Sensitive" mode, which is default behavior, any colonist who is gaining Immunity will be set to Schedule of "Anything", under which schedule they typically go rest in bed. We never drag such a colonist out of bed, regardless of Hunger or Mood.
 
@@ -121,7 +121,7 @@ In "Brutal" mode, we completely disregard their need for Immunity, and we send t
 
 Note that in any mode you can exempt a particular colonist by right-clicking on a bed and manually ordering priority job: "Rest Until Healed", which the mod will never interfere with.
 
-* Hungry Patients: "Wait to be Fed" or "Feed Themselves"
+#### Hungry Patients: "Wait to be Fed" or "Feed Themselves"
 
 In "Wait to be Fed", which is the default behavior, any colonist resting in bed will wait for somebody else to feed them.
 
