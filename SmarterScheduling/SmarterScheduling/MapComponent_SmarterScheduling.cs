@@ -484,11 +484,13 @@ namespace SmarterScheduling
                         setPawnState(p, PawnState.JOY);
                         restrictPawnToPsyche(p);
                     }
+                    /*
                     else if (gainingImmunity)
                     {
                         setPawnState(p, PawnState.ANYTHING);
                         considerReleasingPawn(p);
                     }
+                    */
                     else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
                     {
                         setPawnState(p, PawnState.JOY);
