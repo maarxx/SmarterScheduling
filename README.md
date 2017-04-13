@@ -70,7 +70,7 @@ As soon as you have a good Recreation / Dining room, which provides excellent mo
 The cycle you'll see looks something like this:
 
 * The pawn will be sent to Sleep when they are tired.
-* When they wake, they will probably be critically hungry, so the pawn will set them to Anything for a moment while they eat.
+* When they wake, they will probably be critically hungry, so the pawn will be set to Anything for a moment while they eat.
 * Once they're fed, the mod will set them to Joy, and will restrict them to Psyche that you've specified.
 * The pawn will be held in Psyche for Joy, not just until their Joy is maximized, but until their Beauty, Comfort, Space, and overall Mood is maximized.
 * Then it will set them to Work, and release them from Psyche, back to whatever Area you had previously set.
