@@ -2,6 +2,8 @@
 
 This is a mod for the game RimWorld by Ludeon Studios.
 
+It automatically manages your Pawn's Sleep, Joy, and Work cycles.
+
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -68,7 +70,7 @@ As soon as you have a good Recreation / Dining room, which provides excellent mo
 The cycle you'll see looks something like this:
 
 * The pawn will be sent to Sleep when they are tired.
-* When they wake, they will probably be critically hungry, so the pawn will set them to Anything for a moment while they eat.
+* When they wake, they will probably be critically hungry, so the pawn will be set to Anything for a moment while they eat.
 * Once they're fed, the mod will set them to Joy, and will restrict them to Psyche that you've specified.
 * The pawn will be held in Psyche for Joy, not just until their Joy is maximized, but until their Beauty, Comfort, Space, and overall Mood is maximized.
 * Then it will set them to Work, and release them from Psyche, back to whatever Area you had previously set.
@@ -85,13 +87,13 @@ Pawns in Psyche might refuse to sit down and maximize their Comfort. I suggest k
 
 Since we are taking responsibility for controlling a pawn's Sleep, Joy, and Work schedules, and changing their Allowed Area, we therefore inherit the responsibility to perform a couple additional tasks with this mod.
 
-#### Party
+## Party
 
 The mod knows whether there is a Party being thrown, and will set all Pawns to "Anything" for the duration of the Party.
 
 If they are sleeping through the Party, the mod will automatically wake them up.
 
-#### Doctoring
+## Doctoring
 
 It would be irresponsible to send all of your Doctors to Sleep or Joy while somebody needs medical treatment. Therefore, we also take responsibility of knowing whether any pawns require medical treatment, and which pawns are doctors.
 
@@ -101,7 +103,7 @@ As a side effect of this, you will notice that your doctor's response times have
 
 This mod also assumes that your doctors have doctoring as their highest relevant priority. If you have something as a higher priority, the mod will get confused as to why nobody is providing treatment, and start chain-resetting your doctors. This is typically indicative of an incorrect work tab, anyway.
 
-#### Medical Conditions Not Requiring Treatment
+## Medical Conditions Not Requiring Treatment
 
 An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
 
@@ -109,13 +111,17 @@ These conditions are very disruptive to your colony. Your pawn lays in bed, and 
 
 Therefore, the mod provides two more options for how such cases should be handled:
 
-* Immunity Handling: "Sensitive" or "Dangerous".
+#### Immunity Handling: "Sensitive" or "Balanced" or "Brutal".
 
-In "Sensitive" mode, which is default behavior, we never drag a colonist out of bed who is gaining Immunity, regardless of Hunger or Mood.
+In "Sensitive" mode, which is default behavior, any colonist who is gaining Immunity will be set to Schedule of "Anything", under which schedule they typically go rest in bed. We never drag such a colonist out of bed, regardless of Hunger or Mood.
 
-In "Dangerous" mode, we'll sometimes drag a colonist out of bed who is gaining Immunity. Use this when you are well-established with good Hospital Beds and Medicine and Penoxy and everybody's Immunity has a 30% lead for their Flu and you just want them to stop being little sissies and at the very least take care of themselves and not suffer a mental break.
+In "Balanced" mode, we will drag a colonist out of bed to attend a Party, or to send them to Psyche for low Mood or Joy, or possibly to feed themselves, based upon the next setting described below.
 
-* Hungry Patients: "Wait to be Fed" or "Feed Themselves"
+In "Brutal" mode, we completely disregard their need for Immunity, and we send them to Sleep or to Joy or to Work like any other colonist.
+
+Note that in any mode you can exempt a particular colonist by right-clicking on a bed and manually ordering priority job: "Rest Until Healed", which the mod will never interfere with.
+
+#### Hungry Patients: "Wait to be Fed" or "Feed Themselves"
 
 In "Wait to be Fed", which is the default behavior, any colonist resting in bed will wait for somebody else to feed them.
 
