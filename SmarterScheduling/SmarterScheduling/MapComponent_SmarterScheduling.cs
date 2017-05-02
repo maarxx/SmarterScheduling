@@ -224,7 +224,7 @@ namespace SmarterScheduling
         public bool tryToResetPawn(Pawn p)
         {
             if (   p.health.capacities.CanBeAwake
-                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0.11F
+                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0.16F
                 && !p.health.InPainShock
                 && !p.Drafted
                 && !p.CurJob.playerForced
