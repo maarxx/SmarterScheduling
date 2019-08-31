@@ -36,7 +36,7 @@ namespace SmarterScheduling
         {
             base.DoWindowContents(canvas);
 
-            MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
+            MapComponent_SmarterScheduling component = Find.CurrentMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
             MapComponent_SmarterScheduling.ImmuneSensitivity curImmuneSensitivity = component.immuneSensitivity;
             bool curSpoonFeeding = component.spoonFeeding;

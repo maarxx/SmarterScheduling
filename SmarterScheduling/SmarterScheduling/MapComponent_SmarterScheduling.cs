@@ -82,7 +82,7 @@ namespace SmarterScheduling
             {
                 if (a.ToString() == PSYCHE_NAME)
                 {
-                    if (a.AssignableAsAllowed(AllowedAreaMode.Humanlike))
+                    if (a.AssignableAsAllowed())
                     {
                         this.psyche = a;
                     }
@@ -95,7 +95,7 @@ namespace SmarterScheduling
             if (this.psyche == null)
             {
                 Area_Allowed newPsyche;
-                map.areaManager.TryMakeNewAllowed(AllowedAreaMode.Humanlike, out newPsyche);
+                map.areaManager.TryMakeNewAllowed(out newPsyche);
                 newPsyche.SetLabel(PSYCHE_NAME);
                 this.psyche = newPsyche;
             }
@@ -125,7 +125,7 @@ namespace SmarterScheduling
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
-                if (p.health.HasHediffsNeedingTendByColony() && p.playerSettings.medCare > 0)
+                if (p.health.HasHediffsNeedingTendByPlayer() && p.playerSettings.medCare > 0)
                 {
                     return true;
                 }
@@ -138,12 +138,12 @@ namespace SmarterScheduling
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
                 if (
-                    p.health.HasHediffsNeedingTendByColony()
+                    p.health.HasHediffsNeedingTendByPlayer()
                     && p.playerSettings.medCare > 0
                     && p.CurJob.def.reportString == "lying down."
                     && p.CurJob.targetA.Thing != null
                     && !p.pather.Moving
-                    && !map.reservationManager.IsReserved(p, Faction.OfPlayer)
+                    && !map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer)
                     )
                 {
                     return true;
@@ -224,7 +224,7 @@ namespace SmarterScheduling
         public bool tryToResetPawn(Pawn p)
         {
             if (   p.health.capacities.CanBeAwake
-                && p.health.capacities.GetEfficiency(PawnCapacityDefOf.Moving) > 0.16F
+                && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
                 && !p.health.InPainShock
                 && !p.Drafted
                 && !p.CurJob.playerForced
@@ -342,7 +342,7 @@ namespace SmarterScheduling
                     bool currentlyTreating = false;
                     if (anyoneNeedingTreatment)
                     {
-                        needsTreatment = p.health.HasHediffsNeedingTendByColony();
+                        needsTreatment = p.health.HasHediffsNeedingTendByPlayer();
                         isDoctor = isPawnDoctor(p);
                         currentlyTreating = (p.CurJob.def.reportString == "tending to TargetA.");
                         if (isDoctor)
