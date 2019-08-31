@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <MainButtonDef>
+    <defName>SmarterScheduling</defName>
+    <label>SmarterScheduling</label>
+    <description>Toggle option to automatically manage your Pawn's Sleep, Joy, and Work cycles.</description>
+    <tabWindowClass>SmarterScheduling.MainTabWindow_SmarterScheduling</tabWindowClass>
+    <order>997</order>
+    <validWithoutMap>false</validWithoutMap>
+    <!--<defaultToggleKey>F1</defaultToggleKey>-->
+  </MainButtonDef>
+  
+</Defs>
