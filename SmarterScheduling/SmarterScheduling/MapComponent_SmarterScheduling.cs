@@ -184,11 +184,11 @@ namespace SmarterScheduling
             foreach (WorkGiver wg in p.workSettings.WorkGiversInOrderNormal)
             {
                 String workGiverString = wg.def.verb + "," + wg.def.priorityInType;
-                if (workGiverString == "treat,100")
+                if (workGiverString == "tend to,100")
                 {
                     return true;
                 }
-                else if (workGiverString == "treat,70")
+                else if (workGiverString == "tend to,90")
                 {
                     return true;
                 }
@@ -225,6 +225,7 @@ namespace SmarterScheduling
         {
             if (   p.health.capacities.CanBeAwake
                 && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
+                && p.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness) > 0.11F
                 && !p.health.InPainShock
                 && !p.Drafted
                 && !p.CurJob.playerForced
