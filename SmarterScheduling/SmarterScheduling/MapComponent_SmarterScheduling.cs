@@ -221,15 +221,19 @@ namespace SmarterScheduling
             return false;
         }
 
+        public bool pawnCanMove(Pawn p)
+        {
+            return  p.health.capacities.CanBeAwake
+                    && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
+                    && !p.health.InPainShock;
+        }
+
         public bool tryToResetPawn(Pawn p)
         {
-            if (   p.health.capacities.CanBeAwake
-                && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
-                && p.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness) > 0.11F
-                && !p.health.InPainShock
-                && !p.Drafted
-                && !p.CurJob.playerForced
-                && !p.CurJob.def.reportString.Equals("consuming TargetA.")
+            if (    pawnCanMove(p)
+                    && !p.Drafted
+                    && !p.CurJob.playerForced
+                    && !p.CurJob.def.reportString.Equals("consuming TargetA.")
                 )
             {
                 p.jobs.StopAll(false);
@@ -282,7 +286,10 @@ namespace SmarterScheduling
 
         public void restrictPawnToPsyche(Pawn p)
         {
-            p.playerSettings.AreaRestriction = this.psyche;
+            if (pawnCanMove(p))
+            {
+                p.playerSettings.AreaRestriction = this.psyche;
+            }
         }
 
         public void considerReleasingPawn(Pawn p)
