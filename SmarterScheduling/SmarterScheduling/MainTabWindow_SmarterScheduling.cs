@@ -45,7 +45,13 @@ namespace SmarterScheduling
             foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
             {
                 menuImmuneSensitivty.Add(new FloatMenuOption(immSen.ToString().ToLower().CapitalizeFirst(), delegate { component.immuneSensitivity = immSen; }));
-            }     
+            }
+
+            List<FloatMenuOption> menuResetAllSchedules = new List<FloatMenuOption>();
+            foreach (MapComponent_SmarterScheduling.PawnState pawnState in Enum.GetValues(typeof(MapComponent_SmarterScheduling.PawnState)))
+            {
+                menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { component.resetAllSchedules(pawnState); }));
+            }
 
             Text.Font = GameFont.Small;
             for (int i = 0; i < 4; i++)
@@ -73,10 +79,10 @@ namespace SmarterScheduling
                         }
                         break;
                     case 1:
-                        buttonLabel = "Reset All Pawn's" + Environment.NewLine + "Schedules to Anything";
+                        buttonLabel = "Reset All Pawn's" + Environment.NewLine + "Schedules to ...";
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
-                            component.resetAllSchedules(MapComponent_SmarterScheduling.PawnState.ANYTHING);
+                            Find.WindowStack.Add(new FloatMenu(menuResetAllSchedules));
                         }
                         break;
                     case 2:
