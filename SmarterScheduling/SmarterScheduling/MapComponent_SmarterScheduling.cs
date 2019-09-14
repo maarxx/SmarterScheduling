@@ -24,11 +24,18 @@ namespace SmarterScheduling
             BRUTAL
         }
 
+        public enum ScheduleType
+        {
+            WORK,
+            MAXMOOD
+        }
+
         public const float REST_THRESH_CRITICAL = 0.05F ;
 
         public const float HUNGER_THRESH_LOW    = 0.29F ;
 
         public const float REST_THRESH_LOW      = 0.35F ;
+        public const float REST_THRESH_CANSLEEP = 0.74F ;
         public const float REST_THRESH_HIGH     = 0.90F ;
 
         public const float JOY_THRESH_LOW       = 0.28F ;
@@ -48,6 +55,8 @@ namespace SmarterScheduling
         public ImmuneSensitivity immuneSensitivity;
         public bool spoonFeeding;
 
+        public ScheduleType curSchedule;
+
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
@@ -57,6 +66,8 @@ namespace SmarterScheduling
             this.enabled = false;
             this.immuneSensitivity = ImmuneSensitivity.SENSITIVE;
             this.spoonFeeding = true;
+
+            this.curSchedule = ScheduleType.WORK;
 
             this.slowDown = 0;
             //initPlayerAreas();
@@ -505,6 +516,16 @@ namespace SmarterScheduling
                         considerReleasingPawn(p);
                     }
                     else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (curSchedule == ScheduleType.MAXMOOD && p.needs.rest.CurLevel < REST_THRESH_CANSLEEP)
+                    {
+                        setPawnState(p, PawnState.SLEEP);
+                        considerReleasingPawn(p);
+                    }
+                    else if (curSchedule == ScheduleType.MAXMOOD)
                     {
                         setPawnState(p, PawnState.JOY);
                         restrictPawnToPsyche(p);

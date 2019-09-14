@@ -39,6 +39,7 @@ namespace SmarterScheduling
             MapComponent_SmarterScheduling component = Find.CurrentMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
             MapComponent_SmarterScheduling.ImmuneSensitivity curImmuneSensitivity = component.immuneSensitivity;
+            MapComponent_SmarterScheduling.ScheduleType curSchedule = component.curSchedule;
             bool curSpoonFeeding = component.spoonFeeding;
 
             List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
@@ -53,8 +54,14 @@ namespace SmarterScheduling
                 menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { component.resetAllSchedules(pawnState); }));
             }
 
+            List<FloatMenuOption> menuScheduleTypes = new List<FloatMenuOption>();
+            foreach (MapComponent_SmarterScheduling.ScheduleType scheduleType in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ScheduleType)))
+            {
+                menuScheduleTypes.Add(new FloatMenuOption(scheduleType.ToString().ToLower().CapitalizeFirst(), delegate { component.curSchedule = scheduleType; }));
+            }
+
             Text.Font = GameFont.Small;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
@@ -105,6 +112,13 @@ namespace SmarterScheduling
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
                             component.spoonFeeding = !curSpoonFeeding;
+                        }
+                        break;
+                    case 4:
+                        buttonLabel = "Schedule Type is:" + Environment.NewLine + curSchedule.ToString().ToLower().CapitalizeFirst();
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            Find.WindowStack.Add(new FloatMenu(menuScheduleTypes));
                         }
                         break;
                 }
