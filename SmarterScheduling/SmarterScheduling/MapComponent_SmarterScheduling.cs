@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Verse;
 using Verse.AI.Group;
 
@@ -132,35 +133,41 @@ namespace SmarterScheduling
             }
         }
 
-        public bool isAnyoneNeedingTreatment()
+        // TODO: Optimize this by subscribing to Pawn_HealthTracker.CheckForStateChange via Harmony Postfix,
+        // then query them at that time on whether they need tending, and maintain a standing collection of
+        // all pawns needing tending.
+        public void isAnyPendingTreatments(out bool needing, out bool awaiting)
         {
+            needing = false;
+            awaiting = false;
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
-                if (p.health.HasHediffsNeedingTendByPlayer() && p.playerSettings.medCare > 0)
+                if (HealthAIUtility.ShouldBeTendedNowByPlayer(p))
                 {
-                    return true;
+                    needing = true;
+                    if (WorkGiver_Tend.GoodLayingStatusForTend(p, null))
+                    {
+                        awaiting = true;
+                        return;
+                    }
                 }
             }
-            return false;
-        }
-
-        public bool isAnyoneAwaitingTreatment()
-        {
-            foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
+            IEnumerable<Pawn> animals = from p in map.mapPawns.PawnsInFaction(Faction.OfPlayer)
+                                        where p.RaceProps.Animal
+                                        select p;
+            foreach (Pawn p in animals)
             {
-                if (
-                    p.health.HasHediffsNeedingTendByPlayer()
-                    && p.playerSettings.medCare > 0
-                    && p.CurJob.def.reportString == "lying down."
-                    && p.CurJob.targetA.Thing != null
-                    && !p.pather.Moving
-                    && !map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer)
-                    )
+                if (HealthAIUtility.ShouldBeTendedNowByPlayer(p))
                 {
-                    return true;
+                    needing = true;
+                    if (WorkGiver_Tend.GoodLayingStatusForTend(p, null))
+                    {
+                        awaiting = true;
+                        return;
+                    }
                 }
             }
-            return false;
+            return;
         }
 
         public bool isPawnGainingImmunity(Pawn p)
@@ -327,13 +334,14 @@ namespace SmarterScheduling
 
                 bool party = isThereAParty();
 
-                bool anyoneNeedingTreatment = isAnyoneNeedingTreatment();
+                bool anyoneNeedingTreatment = false;
                 bool anyoneAwaitingTreatment = false;
+                isAnyPendingTreatments(out anyoneNeedingTreatment, out anyoneAwaitingTreatment);
+
                 Pawn laziestDoctor = null;
                 bool alreadyResetDoctorThisTick = false;
                 if (anyoneNeedingTreatment)
                 {
-                    anyoneAwaitingTreatment = isAnyoneAwaitingTreatment();
                     if (this.doctorResetTick.Count > 0)
                     {
                         laziestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
