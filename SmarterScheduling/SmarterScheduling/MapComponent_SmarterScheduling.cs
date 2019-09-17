@@ -36,7 +36,7 @@ namespace SmarterScheduling
 
         public const float REST_THRESH_LOW      = 0.35F ;
         public const float REST_THRESH_CANSLEEP = 0.74F ;
-        public const float REST_THRESH_HIGH     = 0.90F ;
+        public const float REST_THRESH_HIGH     = 0.95F ;
 
         public const float JOY_THRESH_LOW       = 0.28F ;
         public const float JOY_THRESH_HIGH      = 0.90F ;
