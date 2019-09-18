@@ -136,23 +136,26 @@ namespace SmarterScheduling
         // TODO: Optimize this by subscribing to Pawn_HealthTracker.CheckForStateChange via Harmony Postfix,
         // then query them at that time on whether they need tending, and maintain a standing collection of
         // all pawns needing tending.
-        public void isAnyPendingTreatments(out bool needing, out bool awaiting)
+        public void isAnyPendingTreatments(out bool needing, out bool awaiting, out Pawn firstAwaiting)
         {
             needing = false;
             awaiting = false;
+            firstAwaiting = null;
             foreach (Pawn p in map.mapPawns.FreeColonistsAndPrisonersSpawned)
             {
                 if (HealthAIUtility.ShouldBeTendedNowByPlayer(p))
                 {
                     needing = true;
-                    if (WorkGiver_Tend.GoodLayingStatusForTend(p, null))
+                    if (WorkGiver_Tend.GoodLayingStatusForTend(p, null) && !map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer))
                     {
+                        Log.Message("awaiting: " + p.Name.ToStringShort);
                         awaiting = true;
+                        firstAwaiting = p;
                         return;
                     }
                 }
             }
-            IEnumerable<Pawn> animals = from p in map.mapPawns.PawnsInFaction(Faction.OfPlayer)
+            IEnumerable<Pawn> animals = from p in map.mapPawns.SpawnedPawnsInFaction(Faction.OfPlayer)
                                         where p.RaceProps.Animal
                                         select p;
             foreach (Pawn p in animals)
@@ -160,9 +163,11 @@ namespace SmarterScheduling
                 if (HealthAIUtility.ShouldBeTendedNowByPlayer(p))
                 {
                     needing = true;
-                    if (WorkGiver_Tend.GoodLayingStatusForTend(p, null))
+                    if (WorkGiver_Tend.GoodLayingStatusForTend(p, null) && !map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer))
                     {
+                        Log.Message("awaiting: " + p.Name.ToStringShort);
                         awaiting = true;
+                        firstAwaiting = p;
                         return;
                     }
                 }
@@ -336,7 +341,8 @@ namespace SmarterScheduling
 
                 bool anyoneNeedingTreatment = false;
                 bool anyoneAwaitingTreatment = false;
-                isAnyPendingTreatments(out anyoneNeedingTreatment, out anyoneAwaitingTreatment);
+                Pawn firstAwaiting = null;
+                isAnyPendingTreatments(out anyoneNeedingTreatment, out anyoneAwaitingTreatment, out firstAwaiting);
 
                 Pawn laziestDoctor = null;
                 bool alreadyResetDoctorThisTick = false;
@@ -367,11 +373,13 @@ namespace SmarterScheduling
                     bool needsTreatment = false;
                     bool isDoctor = false;
                     bool currentlyTreating = false;
+                    bool isReserved = false;
                     if (anyoneNeedingTreatment)
                     {
                         needsTreatment = p.health.HasHediffsNeedingTendByPlayer();
                         isDoctor = isPawnDoctor(p);
                         currentlyTreating = (p.CurJob.def.reportString == "tending to TargetA.");
+                        isReserved =  map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer);
                         if (isDoctor)
                         {
                             if (!this.doctorResetTick.ContainsKey(p))
@@ -432,7 +440,7 @@ namespace SmarterScheduling
                     }
                     else if (anyoneNeedingTreatment && isDoctor)
                     {
-                        if (currentlyTreating)
+                        if (currentlyTreating || isReserved || (p == firstAwaiting))
                         {
                             setPawnState(p, PawnState.ANYTHING);
                             considerReleasingPawn(p);
@@ -457,6 +465,7 @@ namespace SmarterScheduling
                                     setPawnState(p, PawnState.WORK);
                                     considerReleasingPawn(p);
 
+                                    Log.Message("Resetting (" + p.Name.ToStringShort + ") for Doctor, current job: " + p.CurJob.ToString());
                                     if (tryToResetPawn(p))
                                     {
                                         alreadyResetDoctorThisTick = true;
