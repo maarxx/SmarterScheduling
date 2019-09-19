@@ -203,19 +203,25 @@ namespace SmarterScheduling
         // Otherwise, you're not a doctor.
         public bool isPawnDoctor(Pawn p)
         {
+            return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tend to,100", "tend to,90" }, 15);
+        }
+
+        public bool isPawnHandler(Pawn p)
+        {
+            return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tame,80", "training,70" }, 15);
+        }
+
+        public bool doesPawnHaveWorkGiverAtPriority(Pawn p, string[] workGiverStrings, int minPriority)
+        {
             int i = 0;
             foreach (WorkGiver wg in p.workSettings.WorkGiversInOrderNormal)
             {
                 String workGiverString = wg.def.verb + "," + wg.def.priorityInType;
-                if (workGiverString == "tend to,100")
+                if (workGiverStrings.Contains(workGiverString))
                 {
                     return true;
                 }
-                else if (workGiverString == "tend to,90")
-                {
-                    return true;
-                }
-                if (i > 15)
+                if (i > minPriority)
                 {
                     return false;
                 }
@@ -244,20 +250,29 @@ namespace SmarterScheduling
             return false;
         }
 
-        public bool pawnCanMove(Pawn p)
+        public bool isAnimalSleepingTime()
         {
-            return  p.health.capacities.CanBeAwake
-                    && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
-                    && !p.health.InPainShock;
+            int hour = GenLocalDate.HourOfDay(map.Tile);
+            return (hour >= 22 || hour <= 5);
         }
 
+        public bool pawnCanMove(Pawn p)
+        {
+            return p.health.capacities.CanBeAwake
+                   && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
+                   && !p.health.InPainShock;
+        }
+
+        public bool shouldDisruptPawn(Pawn p)
+        {
+            return pawnCanMove(p)
+                   && !p.Drafted
+                   && !p.CurJob.playerForced
+                   && !p.CurJob.def.reportString.Equals("consuming TargetA.");
+        }
         public bool tryToResetPawn(Pawn p)
         {
-            if (    pawnCanMove(p)
-                    && !p.Drafted
-                    && !p.CurJob.playerForced
-                    && !p.CurJob.def.reportString.Equals("consuming TargetA.")
-                )
+            if (shouldDisruptPawn(p))
             {
                 p.jobs.StopAll(false);
                 return true;
@@ -309,7 +324,7 @@ namespace SmarterScheduling
 
         public void restrictPawnToPsyche(Pawn p)
         {
-            if (pawnCanMove(p))
+            if (shouldDisruptPawn(p))
             {
                 p.playerSettings.AreaRestriction = this.psyche;
             }
@@ -370,10 +385,14 @@ namespace SmarterScheduling
                     bool tired = (p.needs.rest.CurLevel < REST_THRESH_LOW);
                     bool exhausted = (p.needs.rest.CurLevel < REST_THRESH_CRITICAL);
 
+                    bool isHandler = false;
+                    bool isAnimalSleepTime = isAnimalSleepingTime();
+
                     bool needsTreatment = false;
+                    bool isReserved = false;
                     bool isDoctor = false;
                     bool currentlyTreating = false;
-                    bool isReserved = false;
+
                     if (anyoneNeedingTreatment)
                     {
                         needsTreatment = p.health.HasHediffsNeedingTendByPlayer();
@@ -533,6 +552,16 @@ namespace SmarterScheduling
                         considerReleasingPawn(p);
                     }
                     else if (p.needs.rest.CurLevel > REST_THRESH_HIGH && !(p.needs.rest.GUIChangeArrow > 0))
+                    {
+                        setPawnState(p, PawnState.JOY);
+                        restrictPawnToPsyche(p);
+                    }
+                    else if (isAnimalSleepTime && (isHandler = isPawnHandler(p)) && p.needs.rest.CurLevel < REST_THRESH_CANSLEEP)
+                    {
+                        setPawnState(p, PawnState.SLEEP);
+                        considerReleasingPawn(p);
+                    }
+                    else if (isAnimalSleepTime && isHandler)
                     {
                         setPawnState(p, PawnState.JOY);
                         restrictPawnToPsyche(p);
