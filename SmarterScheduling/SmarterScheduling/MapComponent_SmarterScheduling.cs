@@ -542,6 +542,10 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
+                else if (rest < 0.29f)
+                {
+                    setPawnState(p, PawnState.SLEEP);
+                }
                 else if (p.needs.joy.CurLevel < 0.30f)
                 {
                     setPawnState(p, PawnState.JOY);
@@ -570,7 +574,7 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (canSleep && (stateJoy || stateSleep))
+                else if ((canSleep || sleeping) && (stateJoy || stateSleep))
                 {
                     setPawnState(p, PawnState.SLEEP);
                 }
@@ -594,10 +598,7 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (rest < 0.29f)
-                {
-                    setPawnState(p, PawnState.SLEEP);
-                }
+                
                 else
                 {
                     setPawnState(p, PawnState.WORK);
@@ -617,9 +618,7 @@ namespace SmarterScheduling
                         }
                     }
                 }
-
             }
         }
-
     }
 }
