@@ -551,7 +551,7 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (rest < 0.29f)
+                else if (rest < 0.32f)
                 {
                     setPawnState(p, PawnState.SLEEP);
                 }
