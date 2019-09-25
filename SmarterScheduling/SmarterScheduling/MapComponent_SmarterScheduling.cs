@@ -303,6 +303,12 @@ namespace SmarterScheduling
         {
             pawnStates[p] = state;
 
+            // Weird bug where, if they are in Joy+Psyche,
+            // and we simultaneously update them to Sleep+Released,
+            // they sometimes sleep in Psyche.
+            // So we Release and then Sleep across two cycles.
+            bool twoPhase = (state == PawnState.SLEEP) && (p.playerSettings.AreaRestriction == this.psyche);
+
             if (state == PawnState.JOY || forcedPsyche)
             {
                 restrictPawnToPsyche(p);
@@ -329,6 +335,9 @@ namespace SmarterScheduling
             {
                 newTad = TimeAssignmentDefOf.Anything;
             }
+
+            // See above "weird bug".
+            if (twoPhase) { return; }
 
             for (int i = 0; i < 24; i++)
             {
