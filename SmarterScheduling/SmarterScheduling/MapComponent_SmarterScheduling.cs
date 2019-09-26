@@ -299,6 +299,7 @@ namespace SmarterScheduling
 
         public void resetAllSchedules(PawnState state)
         {
+            initPawnsIntoCollection();
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
                 setPawnState(p, state);
