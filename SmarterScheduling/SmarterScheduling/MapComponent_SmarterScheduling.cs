@@ -497,19 +497,14 @@ namespace SmarterScheduling
 
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
-                else if (rest < 0.05f)
+                else if (rest < 0.10f)
                 {
                     setPawnState(p, PawnState.SLEEP);
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
                 else if (anyoneAwaitingTreatment && isDoctor)
                 {
-                    if ((sleeping || stateSleep) && rest < 0.15f)
-                    {
-                        setPawnState(p, PawnState.SLEEP);
-                        doctorNotLazy(p);
-                    }
-                    else if (mood < MAJOR_BREAK)
+                    if (mood < MAJOR_BREAK)
                     {
                         setPawnState(p, PawnState.JOY);
                         doctorNotLazy(p);
@@ -518,10 +513,6 @@ namespace SmarterScheduling
                     {
                         doctorSubroutine(p);
                     }
-                }
-                else if ((sleeping || stateSleep) && rest <= 0.45f)
-                {
-                    setPawnState(p, PawnState.SLEEP);
                 }
                 else if (party)
                 {
@@ -539,6 +530,10 @@ namespace SmarterScheduling
                         }
                     }
                 }
+                else if (rest < 0.32f)
+                {
+                    setPawnState(p, PawnState.SLEEP);
+                }
                 else if (mood < MAJOR_BREAK)
                 {
                     setPawnState(p, PawnState.JOY);
@@ -551,10 +546,6 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (rest < 0.32f)
-                {
-                    setPawnState(p, PawnState.SLEEP);
-                }
                 else if (p.needs.joy.CurLevel < 0.30f)
                 {
                     setPawnState(p, PawnState.JOY);
@@ -566,10 +557,6 @@ namespace SmarterScheduling
                 else if (justWokeRested)
                 {
                     setPawnState(p, PawnState.JOY);
-                }
-                else if (stateJoy && rest < 0.31f)
-                {
-                    setPawnState(p, PawnState.SLEEP);
                 }
                 else if (stateJoy && p.needs.joy.CurLevel < 0.90f)
                 {
