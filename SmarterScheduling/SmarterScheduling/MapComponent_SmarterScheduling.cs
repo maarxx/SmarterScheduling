@@ -390,14 +390,14 @@ namespace SmarterScheduling
             bool isReserved = map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer);
             if (currentlyTreating || isReserved || (p == firstAwaiting))
             {
-                setPawnState(p, PawnState.ANYTHING);
+                //setPawnState(p, PawnState.ANYTHING);
                 doctorNotLazy(p);
             }
             else
             {
                 if (alreadyResetDoctorThisTick || !p.Equals(laziestDoctor))
                 {
-                    setPawnState(p, PawnState.ANYTHING);
+                    //setPawnState(p, PawnState.ANYTHING);
                 }
                 else
                 {
@@ -519,6 +519,10 @@ namespace SmarterScheduling
                     {
                         setPawnState(p, PawnState.JOY);
                         doctorNotLazy(p);
+                    }
+                    else
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
                     }
 
                     doctorSubroutine(p);
