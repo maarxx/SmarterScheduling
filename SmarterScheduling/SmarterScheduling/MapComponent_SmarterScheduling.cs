@@ -490,7 +490,7 @@ namespace SmarterScheduling
                 else if (hungry && !sleeping && !needsTreatment)
                 {
                     setPawnState(p, PawnState.JOY, false);
-                    if (shouldResetPawnOnHungry[p])
+                    if (shouldResetPawnOnHungry[p] && pawnCanMove(p))
                     {
                         restrictPawnToPsyche(p, true);
                         shouldResetPawnOnHungry[p] = false;
