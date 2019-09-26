@@ -34,6 +34,7 @@ namespace SmarterScheduling
         public const string PSYCHE_NAME = "Psyche";
 
         public Dictionary<Pawn, PawnState> pawnStates;
+        public Dictionary<Pawn, bool> shouldResetPawnOnHungry;
         public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorResetTick;
 
@@ -50,6 +51,7 @@ namespace SmarterScheduling
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
+            this.shouldResetPawnOnHungry = new Dictionary<Pawn, bool>();
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorResetTick = new Dictionary<Pawn, int>();
 
@@ -118,6 +120,10 @@ namespace SmarterScheduling
                 if (!pawnStates.ContainsKey(p))
                 {
                     pawnStates.Add(p, PawnState.ANYTHING);
+                }
+                if (!shouldResetPawnOnHungry.ContainsKey(p))
+                {
+                    shouldResetPawnOnHungry.Add(p, true);
                 }
             }
         }
@@ -336,9 +342,9 @@ namespace SmarterScheduling
             }
         }
 
-        public void restrictPawnToPsyche(Pawn p)
+        public void restrictPawnToPsyche(Pawn p, bool forced = false)
         {
-            if (shouldDisruptPawn(p))
+            if (forced || shouldDisruptPawn(p))
             {
                 p.playerSettings.AreaRestriction = this.psyche;
             }
@@ -448,6 +454,7 @@ namespace SmarterScheduling
                 bool justWokeRested = !sleeping && (p.needs.rest.CurLevel > 0.95f);
                 
                 bool hungry = (p.needs.food.CurLevel < 0.29f);
+                if (!hungry) { shouldResetPawnOnHungry[p] = true; }
 
                 float rest = p.needs.rest.CurLevel;
                 float joy = p.needs.rest.CurLevel;
@@ -479,12 +486,16 @@ namespace SmarterScheduling
                 }
                 else if (hungry && !sleeping)
                 {
-                    //setPawnState(p, PawnState.ANYTHING);
-                    for (int i = 0; i < 24; i++)
+                    setPawnState(p, PawnState.JOY);
+                    if (shouldResetPawnOnHungry[p])
                     {
-                        p.timetable.SetAssignment(i, TimeAssignmentDefOf.Anything);
+                        restrictPawnToPsyche(p, true);
+                        shouldResetPawnOnHungry[p] = false;
                     }
-                    considerReleasingPawn(p);
+                    else
+                    {
+                        considerReleasingPawn(p);
+                    }
 
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
