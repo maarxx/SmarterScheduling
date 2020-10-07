@@ -447,7 +447,8 @@ namespace SmarterScheduling
                 }
             }
 
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+            List<Pawn> pawns = map.mapPawns.FreeColonistsSpawned.ListFullCopy();
+            foreach (Pawn p in pawns)
             {
                 float EXTREME_BREAK = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02f;
                 float MAJOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02f;
