@@ -15,6 +15,7 @@ namespace SmarterScheduling
             SLEEP,
             JOY,
             WORK,
+            MEDITATE,
             ANYTHING
         }
 
@@ -31,14 +32,16 @@ namespace SmarterScheduling
             MAXMOOD
         }
 
-        public const string PSYCHE_NAME = "Psyche";
+        public const string RECREATION_NAME = "Joy";
+        public const string MEDIDATION_NAME = "Medi";
 
         public Dictionary<Pawn, PawnState> pawnStates;
         public Dictionary<Pawn, bool> shouldResetPawnOnHungry;
         public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorResetTick;
 
-        public Area psyche; 
+        public Area recreation;
+        public Area meditation;
 
         public int slowDown;
 
@@ -78,29 +81,29 @@ namespace SmarterScheduling
             }
         }
 
-        public void initPlayerAreas()
+        public void initPlayerAreas(out Area savedArea, String areaName)
         {
-            this.psyche = null;
+            savedArea = null;
             foreach (Area a in map.areaManager.AllAreas)
             {
-                if (a.ToString() == PSYCHE_NAME)
+                if (a.ToString() == areaName)
                 {
                     if (a.AssignableAsAllowed())
                     {
-                        this.psyche = a;
+                        savedArea = a;
                     }
                     else
                     {
-                        a.SetLabel(PSYCHE_NAME + "2");
+                        a.SetLabel(areaName + "2");
                     }
                 }
             }
-            if (this.psyche == null)
+            if (savedArea == null)
             {
-                Area_Allowed newPsyche;
-                map.areaManager.TryMakeNewAllowed(out newPsyche);
-                newPsyche.SetLabel(PSYCHE_NAME);
-                this.psyche = newPsyche;
+                Area_Allowed newArea;
+                map.areaManager.TryMakeNewAllowed(out newArea);
+                newArea.SetLabel(areaName);
+                savedArea = newArea;
             }
         }
 
@@ -113,7 +116,7 @@ namespace SmarterScheduling
                     lastPawnAreas.Add(p, null);
                 }
                 Area curPawnArea = p.playerSettings.AreaRestriction;
-                if (curPawnArea == null || curPawnArea != psyche)
+                if (curPawnArea == null || (curPawnArea != recreation && curPawnArea != meditation))
                 {
                     lastPawnAreas[p] = curPawnArea;
                 }
@@ -128,7 +131,7 @@ namespace SmarterScheduling
             }
         }
 
-        // TODO: Optimize this O(n) into (O1) by subscribing to Pawn_HealthTracker.CheckForStateChange
+        // TODO: Optimize this O(n) into O(1) by subscribing to Pawn_HealthTracker.CheckForStateChange
         // via Harmony Postfix, then query them at that time on whether they need tending, and maintain
         // a standing collection of all pawns needing tending.
         public void isAnyPendingTreatments(out bool needing, out bool awaiting, out Pawn firstAwaiting)
@@ -312,9 +315,9 @@ namespace SmarterScheduling
 
             if (doRestriction)
             {
-                if (state == PawnState.JOY)
+                if (state == PawnState.JOY || state == PawnState.MEDITATE)
                 {
-                    restrictPawnToPsyche(p);
+                    restrictPawnToActivityArea(p, state);
                 }
                 else
                 {
@@ -335,6 +338,10 @@ namespace SmarterScheduling
             {
                 newTad = TimeAssignmentDefOf.Joy;
             }
+            else if (state == PawnState.MEDITATE)
+            {
+                newTad = TimeAssignmentDefOf.Meditate;
+            }
             else
             {
                 newTad = TimeAssignmentDefOf.Anything;
@@ -346,11 +353,11 @@ namespace SmarterScheduling
             }
         }
 
-        public void restrictPawnToPsyche(Pawn p, bool forced = false)
+        public void restrictPawnToActivityArea(Pawn p, PawnState newState, bool forced = false)
         {
             if (forced || shouldDisruptPawn(p))
             {
-                p.playerSettings.AreaRestriction = this.psyche;
+                p.playerSettings.AreaRestriction = this.recreation;
             }
         }
 
@@ -430,7 +437,8 @@ namespace SmarterScheduling
                 slowDown = 0;
             }
 
-            initPlayerAreas();
+            initPlayerAreas(out this.recreation, RECREATION_NAME);
+            initPlayerAreas(out this.meditation, MEDIDATION_NAME);
             initPawnsIntoCollection();
 
             bool party = isThereAParty();
@@ -470,6 +478,9 @@ namespace SmarterScheduling
                 bool stateSleep = (pawnStates[p] == PawnState.SLEEP);
                 bool stateJoy = (pawnStates[p] == PawnState.JOY);
                 bool stateWork = (pawnStates[p] == PawnState.WORK);
+                bool stateMeditate = (pawnStates[p] == PawnState.MEDITATE);
+
+                bool shouldMeditate = p.HasPsylink && p.psychicEntropy.CurrentPsyfocus < p.psychicEntropy.TargetPsyfocus;
 
                 bool gainingImmunity = isPawnGainingImmunity(p);
 
@@ -494,7 +505,7 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.JOY, false);
                     if (shouldResetPawnOnHungry[p] && pawnCanMove(p))
                     {
-                        restrictPawnToPsyche(p, true);
+                        restrictPawnToActivityArea(p, PawnState.JOY, true);
                         shouldResetPawnOnHungry[p] = false;
                     }
                     else
@@ -585,23 +596,27 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.beauty.GUIChangeArrow > 0)
+                else if (shouldMeditate)
+                {
+                    setPawnState(p, PawnState.MEDITATE);
+                }
+                else if ((stateJoy || stateMeditate) && p.needs.beauty.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.comfort.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && p.needs.comfort.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.mood.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && p.needs.mood.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.mood.CurLevel < MINOR_BREAK)
+                else if ((stateJoy || stateMeditate) && p.needs.mood.CurLevel < MINOR_BREAK)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (sleeping || (canSleep && (stateJoy || stateSleep)))
+                else if (sleeping || (canSleep && (stateJoy || stateSleep || stateMeditate)))
                 {
                     setPawnState(p, PawnState.SLEEP);
                 }
