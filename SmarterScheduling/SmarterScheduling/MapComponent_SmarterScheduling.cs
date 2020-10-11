@@ -449,6 +449,8 @@ namespace SmarterScheduling
 
             if (anyoneNeedingTreatment)
             {
+                alreadyResetDoctorThisTick = false;
+
                 if (this.doctorResetTick.Count > 0)
                 {
                     laziestDoctor = this.doctorResetTick.MinBy(kvp => kvp.Value).Key;
@@ -486,12 +488,14 @@ namespace SmarterScheduling
 
                 bool isHandler = false;
 
+                bool currentlyTreating = false;
                 bool needsTreatment = false;
                 bool isDoctor = false;
                 if (anyoneNeedingTreatment)
                 {
                     needsTreatment = HealthAIUtility.ShouldBeTendedNowByPlayer(p);
                     isDoctor = isPawnDoctor(p);
+                    currentlyTreating = (p.CurJob.def.reportString == "tending to TargetA.");
                     updateDoctorResetTickCollection(p, isDoctor);
                 }
 
@@ -515,7 +519,7 @@ namespace SmarterScheduling
 
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
-                else if (anyoneAwaitingTreatment && isDoctor)
+                else if (currentlyTreating || (anyoneAwaitingTreatment && isDoctor))
                 {
                     if (rest < 0.10f)
                     {
