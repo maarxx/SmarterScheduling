@@ -471,6 +471,8 @@ namespace SmarterScheduling
                 bool hungry = (p.needs.food.CurLevel < 0.29f);
                 if (!hungry) { shouldResetPawnOnHungry[p] = true; }
 
+                bool shouldEatBeforeWork = (p.needs.food.CurLevel < 0.70f);
+
                 float rest = p.needs.rest.CurLevel;
                 float joy = p.needs.rest.CurLevel;
                 float mood = p.needs.mood.CurLevel;
@@ -643,6 +645,15 @@ namespace SmarterScheduling
                 else if (curSchedule == ScheduleType.MAXMOOD)
                 {
                     setPawnState(p, PawnState.JOY);
+                }
+                else if (p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork)
+                {
+                    Thing food = FoodUtility.BestFoodInInventory(p);
+                    if (food != null)
+                    {
+                        setPawnState(p, PawnState.ANYTHING);
+                        FoodUtility.IngestFromInventoryNow(p, food);
+                    }
                 }
                 else
                 {
