@@ -13,6 +13,7 @@ namespace SmarterScheduling
 
         private const float BUTTON_HEIGHT = 50f;
         private const float BUTTON_SPACE = 10f;
+        private const int NUM_BUTTONS = 7;
 
 
         public MainTabWindow_SmarterScheduling()
@@ -25,7 +26,7 @@ namespace SmarterScheduling
             get
             {
                 //return base.InitialSize;
-                return new Vector2(250f, 400f);
+                return new Vector2(250f, (BUTTON_HEIGHT + BUTTON_SPACE) * (NUM_BUTTONS + 1));
             }
         }
 
@@ -41,6 +42,9 @@ namespace SmarterScheduling
             MapComponent_SmarterScheduling.ImmuneSensitivity curImmuneSensitivity = component.immuneSensitivity;
             MapComponent_SmarterScheduling.ScheduleType curSchedule = component.curSchedule;
             bool curSpoonFeeding = component.spoonFeeding;
+
+            bool curDoubleSleep = component.doubleSleep;
+            bool curDoubleEat = component.doubleEat;
 
             List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
             foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
@@ -61,7 +65,7 @@ namespace SmarterScheduling
             }
 
             Text.Font = GameFont.Small;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < NUM_BUTTONS; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
@@ -119,6 +123,36 @@ namespace SmarterScheduling
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
                             Find.WindowStack.Add(new FloatMenu(menuScheduleTypes));
+                        }
+                        break;
+                    case 5:
+                        buttonLabel = "Sleep Cycles Per Work:" + Environment.NewLine;
+                        if (curDoubleSleep)
+                        {
+                            buttonLabel += "Double Sleep";
+                        }
+                        else
+                        {
+                            buttonLabel += "Single Sleep";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.doubleSleep = !curDoubleSleep;
+                        }
+                        break;
+                    case 6:
+                        buttonLabel = "Eat Cycles Per Work:" + Environment.NewLine;
+                        if (curDoubleEat)
+                        {
+                            buttonLabel += "Double Eat";
+                        }
+                        else
+                        {
+                            buttonLabel += "Single Eat";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.doubleEat = !curDoubleEat;
                         }
                         break;
                 }

@@ -51,6 +51,9 @@ namespace SmarterScheduling
 
         public ScheduleType curSchedule;
 
+        public bool doubleSleep;
+        public bool doubleEat;
+
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
@@ -63,6 +66,9 @@ namespace SmarterScheduling
             this.spoonFeeding = true;
 
             this.curSchedule = ScheduleType.WORK;
+
+            this.doubleSleep = false;
+            this.doubleEat = false;
 
             this.slowDown = 0;
             //initPlayerAreas();
@@ -472,6 +478,8 @@ namespace SmarterScheduling
                 if (!hungry) { shouldResetPawnOnHungry[p] = true; }
 
                 bool shouldEatBeforeWork = (p.needs.food.CurLevel < 0.70f);
+                Thing invFood = FoodUtility.BestFoodInInventory(p);
+                bool hasFood = (invFood != null);
 
                 float rest = p.needs.rest.CurLevel;
                 float joy = p.needs.rest.CurLevel;
@@ -521,7 +529,12 @@ namespace SmarterScheduling
 
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
-                else if (currentlyTreating || (anyoneAwaitingTreatment && isDoctor))
+                else if (currentlyTreating)
+                {
+                    setPawnState(p, PawnState.ANYTHING);
+                    doctorNotLazy(p);
+                }
+                else if (anyoneAwaitingTreatment && isDoctor)
                 {
                     if (rest < 0.10f)
                     {
@@ -550,8 +563,7 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.ANYTHING);
                     if (!pawnAttendingParty(p))
                     {
-                        if (needsTreatment
-                            || (gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE))
+                        if (needsTreatment || (gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE))
                         {
                             // Don't interrupt sick pawns for parties. Weirdo.
                         }
@@ -622,7 +634,7 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (sleeping || (canSleep && (stateJoy || stateSleep || stateMeditate)))
+                else if (sleeping || (doubleSleep && canSleep && (stateJoy || stateSleep || stateMeditate)))
                 {
                     setPawnState(p, PawnState.SLEEP);
                 }
@@ -646,14 +658,10 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork)
+                else if (doubleEat && p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork && hasFood)
                 {
-                    Thing food = FoodUtility.BestFoodInInventory(p);
-                    if (food != null)
-                    {
-                        setPawnState(p, PawnState.ANYTHING);
-                        FoodUtility.IngestFromInventoryNow(p, food);
-                    }
+                    setPawnState(p, PawnState.ANYTHING);
+                    FoodUtility.IngestFromInventoryNow(p, invFood);
                 }
                 else
                 {
