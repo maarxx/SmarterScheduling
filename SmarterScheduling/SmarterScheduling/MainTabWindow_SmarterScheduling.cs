@@ -13,7 +13,7 @@ namespace SmarterScheduling
 
         private const float BUTTON_HEIGHT = 50f;
         private const float BUTTON_SPACE = 10f;
-        private const int NUM_BUTTONS = 7;
+        private const int NUM_BUTTONS = 8;
 
 
         public MainTabWindow_SmarterScheduling()
@@ -45,6 +45,7 @@ namespace SmarterScheduling
 
             bool curDoubleSleep = component.doubleSleep;
             bool curDoubleEat = component.doubleEat;
+            bool curManageMeditation = component.manageMeditation;
 
             List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
             foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
@@ -154,6 +155,22 @@ namespace SmarterScheduling
                         {
                             component.doubleEat = !curDoubleEat;
                         }
+                        break;
+                    case 7:
+                        buttonLabel = "Meditation is" + Environment.NewLine;
+                        if (curManageMeditation)
+                        {
+                            buttonLabel += "Managed Here";
+                        }
+                        else
+                        {
+                            buttonLabel += "Not Managed Here";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.manageMeditation = !curManageMeditation;
+                        }
+
                         break;
                 }
             }

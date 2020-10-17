@@ -54,6 +54,8 @@ namespace SmarterScheduling
         public bool doubleSleep;
         public bool doubleEat;
 
+        public bool manageMeditation;
+
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
@@ -69,6 +71,8 @@ namespace SmarterScheduling
 
             this.doubleSleep = false;
             this.doubleEat = false;
+
+            this.manageMeditation = false;
 
             this.slowDown = 0;
             //initPlayerAreas();
@@ -363,7 +367,14 @@ namespace SmarterScheduling
         {
             if (forced || shouldDisruptPawn(p))
             {
-                p.playerSettings.AreaRestriction = this.recreation;
+                if (newState == PawnState.MEDITATE)
+                {
+                    p.playerSettings.AreaRestriction = this.meditation;
+                }
+                else
+                {
+                    p.playerSettings.AreaRestriction = this.recreation;
+                }
             }
         }
 
@@ -614,7 +625,7 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (shouldMeditate)
+                else if (manageMeditation && shouldMeditate)
                 {
                     setPawnState(p, PawnState.MEDITATE);
                 }
