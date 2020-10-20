@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Verse;
 using Verse.AI.Group;
 
@@ -56,6 +57,9 @@ namespace SmarterScheduling
 
         public bool manageMeditation;
 
+        public static JobGiver_OptimizeApparel apparelCheckerInstance;
+        public static MethodInfo apparelCheckerMethod;
+
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
@@ -68,6 +72,10 @@ namespace SmarterScheduling
             this.spoonFeeding = true;
 
             this.curSchedule = ScheduleType.WORK;
+
+            apparelCheckerInstance = new JobGiver_OptimizeApparel();
+            apparelCheckerMethod = apparelCheckerInstance.GetType().
+                GetMethod("TryGiveJob", BindingFlags.NonPublic | BindingFlags.Instance);
 
             this.doubleSleep = false;
             this.doubleEat = false;
@@ -496,6 +504,9 @@ namespace SmarterScheduling
                 float joy = p.needs.rest.CurLevel;
                 float mood = p.needs.mood.CurLevel;
 
+                object changeClothesJob = apparelCheckerMethod.Invoke(apparelCheckerInstance, new object[] { p });
+                bool shouldChangeClothes = changeClothesJob != null;
+
                 bool canSleep = (rest < 0.74f);
 
                 bool stateSleep = (pawnStates[p] == PawnState.SLEEP);
@@ -583,6 +594,10 @@ namespace SmarterScheduling
                             tryToResetPawn(p);
                         }
                     }
+                }
+                else if (shouldChangeClothes)
+                {
+                    setPawnState(p, PawnState.ANYTHING);
                 }
                 else if (rest < 0.32f)
                 {
