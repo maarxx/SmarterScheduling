@@ -539,16 +539,19 @@ namespace SmarterScheduling
                 else if (hungry && !sleeping && !needsTreatment)
                 {
                     setPawnState(p, PawnState.JOY, false);
-                    if (shouldResetPawnOnHungry[p] && pawnCanMove(p))
+                    if (shouldDisruptPawn(p))
                     {
-                        restrictPawnToActivityArea(p, PawnState.JOY);
-                        shouldResetPawnOnHungry[p] = false;
-                    }
-                    else
-                    {
-                        considerReleasingPawn(p);
-                    }
+                        if (shouldResetPawnOnHungry[p] && pawnCanMove(p))
+                        {
+                            restrictPawnToActivityArea(p, PawnState.JOY);
+                            shouldResetPawnOnHungry[p] = false;
+                        }
+                        else
+                        {
+                            considerReleasingPawn(p);
+                        }
 
+                    }
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
                 else if (currentlyTreating)
