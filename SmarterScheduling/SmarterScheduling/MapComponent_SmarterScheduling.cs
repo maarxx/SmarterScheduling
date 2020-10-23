@@ -300,9 +300,11 @@ namespace SmarterScheduling
         public bool shouldDisruptPawn(Pawn p)
         {
             return pawnCanMove(p)
-                   && !p.Drafted
-                   && !p.CurJob.playerForced
-                   && !p.CurJob.def.reportString.Equals("consuming TargetA.");
+                   && !(p.Drafted)
+                   && !(p.CurJob.playerForced)
+                   && !(p.CurJob.def == JobDefOf.Ingest)
+                   && !(p.CurJob.def == JobDefOf.Wear)
+                   && !(p.CurJob.def == JobDefOf.RemoveApparel && p.CurJob.targetA.Thing is Apparel && ((Apparel)p.CurJob.targetA.Thing).Wearer != null);
         }
         public bool tryToResetPawn(Pawn p)
         {
