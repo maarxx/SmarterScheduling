@@ -224,7 +224,7 @@ namespace SmarterScheduling
 
         public bool isPawnHandler(Pawn p)
         {
-            return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tame,80", "training,70" }, 15);
+            return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tame,80", "train,70" }, 15);
         }
 
         public bool doesPawnHaveWorkGiverAtPriority(Pawn p, string[] workGiverStrings, int minPriority)
