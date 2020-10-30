@@ -13,7 +13,7 @@ namespace SmarterScheduling
 
         private const float BUTTON_HEIGHT = 50f;
         private const float BUTTON_SPACE = 10f;
-        private const int NUM_BUTTONS = 8;
+        private const int NUM_BUTTONS = 9;
 
 
         public MainTabWindow_SmarterScheduling()
@@ -46,6 +46,7 @@ namespace SmarterScheduling
             bool curDoubleSleep = component.doubleSleep;
             bool curDoubleEat = component.doubleEat;
             bool curManageMeditation = component.manageMeditation;
+            bool curJoyHoldExtra = component.joyHoldExtra;
 
             List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
             foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
@@ -170,7 +171,21 @@ namespace SmarterScheduling
                         {
                             component.manageMeditation = !curManageMeditation;
                         }
-
+                        break;
+                    case 8:
+                        buttonLabel = "Joy Hold Extra is:" + Environment.NewLine;
+                        if (curJoyHoldExtra)
+                        {
+                            buttonLabel += "Enabled";
+                        }
+                        else
+                        {
+                            buttonLabel += "Disabled";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.joyHoldExtra = !curJoyHoldExtra;
+                        }
                         break;
                 }
             }

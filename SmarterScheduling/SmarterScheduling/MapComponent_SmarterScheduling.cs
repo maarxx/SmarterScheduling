@@ -57,6 +57,8 @@ namespace SmarterScheduling
 
         public bool manageMeditation;
 
+        public bool joyHoldExtra;
+
         public static JobGiver_OptimizeApparel apparelCheckerInstance;
         public static MethodInfo apparelCheckerMethod;
 
@@ -81,6 +83,8 @@ namespace SmarterScheduling
             this.doubleEat = false;
 
             this.manageMeditation = false;
+
+            this.joyHoldExtra = false;
 
             this.slowDown = 0;
             //initPlayerAreas();
@@ -649,11 +653,11 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.MEDITATE);
                 }
-                else if ((stateJoy || stateMeditate) && p.needs.beauty.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && joyHoldExtra && p.needs.beauty.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if ((stateJoy || stateMeditate) && p.needs.comfort.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && joyHoldExtra && p.needs.comfort.GUIChangeArrow > 0)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
