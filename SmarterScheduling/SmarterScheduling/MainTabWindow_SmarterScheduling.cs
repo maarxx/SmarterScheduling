@@ -13,6 +13,7 @@ namespace SmarterScheduling
 
         private const float BUTTON_HEIGHT = 50f;
         private const float BUTTON_SPACE = 10f;
+        private const int NUM_BUTTONS = 9;
 
 
         public MainTabWindow_SmarterScheduling()
@@ -25,7 +26,7 @@ namespace SmarterScheduling
             get
             {
                 //return base.InitialSize;
-                return new Vector2(250f, 400f);
+                return new Vector2(250f, (BUTTON_HEIGHT + BUTTON_SPACE) * (NUM_BUTTONS + 1));
             }
         }
 
@@ -36,19 +37,37 @@ namespace SmarterScheduling
         {
             base.DoWindowContents(canvas);
 
-            MapComponent_SmarterScheduling component = Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>();
+            MapComponent_SmarterScheduling component = Find.CurrentMap.GetComponent<MapComponent_SmarterScheduling>();
             bool curEnabled = component.enabled;
             MapComponent_SmarterScheduling.ImmuneSensitivity curImmuneSensitivity = component.immuneSensitivity;
+            MapComponent_SmarterScheduling.ScheduleType curSchedule = component.curSchedule;
             bool curSpoonFeeding = component.spoonFeeding;
+
+            bool curDoubleSleep = component.doubleSleep;
+            bool curDoubleEat = component.doubleEat;
+            bool curManageMeditation = component.manageMeditation;
+            bool curJoyHoldExtra = component.joyHoldExtra;
 
             List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
             foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
             {
                 menuImmuneSensitivty.Add(new FloatMenuOption(immSen.ToString().ToLower().CapitalizeFirst(), delegate { component.immuneSensitivity = immSen; }));
-            }     
+            }
+
+            List<FloatMenuOption> menuResetAllSchedules = new List<FloatMenuOption>();
+            foreach (MapComponent_SmarterScheduling.PawnState pawnState in Enum.GetValues(typeof(MapComponent_SmarterScheduling.PawnState)))
+            {
+                menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { component.resetAllSchedules(pawnState); }));
+            }
+
+            List<FloatMenuOption> menuScheduleTypes = new List<FloatMenuOption>();
+            foreach (MapComponent_SmarterScheduling.ScheduleType scheduleType in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ScheduleType)))
+            {
+                menuScheduleTypes.Add(new FloatMenuOption(scheduleType.ToString().ToLower().CapitalizeFirst(), delegate { component.curSchedule = scheduleType; }));
+            }
 
             Text.Font = GameFont.Small;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < NUM_BUTTONS; i++)
             {
                 Rect nextButton = new Rect(canvas);
                 nextButton.y = i * (BUTTON_HEIGHT + BUTTON_SPACE);
@@ -73,10 +92,10 @@ namespace SmarterScheduling
                         }
                         break;
                     case 1:
-                        buttonLabel = "Reset All Pawn's" + Environment.NewLine + "Schedules to Anything";
+                        buttonLabel = "Reset All Pawn's" + Environment.NewLine + "Schedules to ...";
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
-                            component.resetAllSchedules(MapComponent_SmarterScheduling.PawnState.ANYTHING);
+                            Find.WindowStack.Add(new FloatMenu(menuResetAllSchedules));
                         }
                         break;
                     case 2:
@@ -99,6 +118,73 @@ namespace SmarterScheduling
                         if (Widgets.ButtonText(nextButton, buttonLabel))
                         {
                             component.spoonFeeding = !curSpoonFeeding;
+                        }
+                        break;
+                    case 4:
+                        buttonLabel = "Schedule Type is:" + Environment.NewLine + curSchedule.ToString().ToLower().CapitalizeFirst();
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            Find.WindowStack.Add(new FloatMenu(menuScheduleTypes));
+                        }
+                        break;
+                    case 5:
+                        buttonLabel = "Sleep Cycles Per Work:" + Environment.NewLine;
+                        if (curDoubleSleep)
+                        {
+                            buttonLabel += "Double Sleep";
+                        }
+                        else
+                        {
+                            buttonLabel += "Single Sleep";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.doubleSleep = !curDoubleSleep;
+                        }
+                        break;
+                    case 6:
+                        buttonLabel = "Eat Cycles Per Work:" + Environment.NewLine;
+                        if (curDoubleEat)
+                        {
+                            buttonLabel += "Double Eat";
+                        }
+                        else
+                        {
+                            buttonLabel += "Single Eat";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.doubleEat = !curDoubleEat;
+                        }
+                        break;
+                    case 7:
+                        buttonLabel = "Meditation is" + Environment.NewLine;
+                        if (curManageMeditation)
+                        {
+                            buttonLabel += "Managed Here";
+                        }
+                        else
+                        {
+                            buttonLabel += "Not Managed Here";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.manageMeditation = !curManageMeditation;
+                        }
+                        break;
+                    case 8:
+                        buttonLabel = "Joy Hold Extra is:" + Environment.NewLine;
+                        if (curJoyHoldExtra)
+                        {
+                            buttonLabel += "Enabled";
+                        }
+                        else
+                        {
+                            buttonLabel += "Disabled";
+                        }
+                        if (Widgets.ButtonText(nextButton, buttonLabel))
+                        {
+                            component.joyHoldExtra = !curJoyHoldExtra;
                         }
                         break;
                 }

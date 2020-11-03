@@ -16,7 +16,7 @@ namespace SmarterScheduling
         }
         public override AlertReport GetReport()
         {
-            if (!Find.VisibleMap.GetComponent<MapComponent_SmarterScheduling>().enabled)
+            if (!Find.CurrentMap.GetComponent<MapComponent_SmarterScheduling>().enabled)
             {
                 return true;
             }
