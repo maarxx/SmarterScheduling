@@ -645,7 +645,7 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.joy.GUIChangeArrow > 0)
+                else if (stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f)
                 {
                     setPawnState(p, PawnState.JOY);
                 }
@@ -700,7 +700,15 @@ namespace SmarterScheduling
                 }
                 else
                 {
-                    setPawnState(p, PawnState.WORK);
+                    if (!stateWork && (p.CurJobDef.defName == "Meditate" || p.CurJobDef.defName == "Reign"))
+                    {
+                        setPawnState(p, PawnState.WORK);
+                        tryToResetPawn(p);
+                    }
+                    else
+                    {
+                        setPawnState(p, PawnState.WORK);
+                    }
                 }
 
                 if (layingDown && !sleeping && !needsTreatment)
