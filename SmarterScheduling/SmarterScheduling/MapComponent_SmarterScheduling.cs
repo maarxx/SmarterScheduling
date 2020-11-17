@@ -422,7 +422,7 @@ namespace SmarterScheduling
         Pawn laziestDoctor = null;
         bool alreadyResetDoctorThisTick = false;
 
-        public void doctorSubroutine(Pawn p)
+        public void doctorSubroutine(Pawn p, Pawn awaiting)
         {
             bool currentlyTreating = (p.CurJob.def.reportString == "tending to TargetA.");
             bool isReserved = map.reservationManager.IsReservedByAnyoneOf(p, Faction.OfPlayer);
@@ -439,14 +439,23 @@ namespace SmarterScheduling
                 }
                 else
                 {
-                    setPawnState(p, PawnState.WORK);
-
-                    Log.Message("Resetting (" + p.Name.ToStringShort + ") for Doctor, current job: " + p.CurJob.ToString());
-                    if (tryToResetPawn(p))
+                    //if (!p.CanReach(awaiting.Position, Verse.AI.PathEndMode.Touch, Danger.Deadly))
+                    if (p.playerSettings.AreaRestriction != null && !p.playerSettings.AreaRestriction[awaiting.Position])
                     {
-                        alreadyResetDoctorThisTick = true;
+                        Log.Message("Was about to reset (" + p.Name.ToStringShort + ") for Doctor, but couldn't reach (" + awaiting.Name.ToStringShort + ")");
+                        doctorNotLazy(p);
                     }
-                    doctorNotLazy(p);
+                    else
+                    {
+                        setPawnState(p, PawnState.WORK);
+
+                        Log.Message("Resetting (" + p.Name.ToStringShort + ") for Doctor, current job: " + p.CurJob.ToString());
+                        if (tryToResetPawn(p))
+                        {
+                            alreadyResetDoctorThisTick = true;
+                        }
+                        doctorNotLazy(p);
+                    }
                 }
             }
         }
@@ -587,7 +596,7 @@ namespace SmarterScheduling
                         setPawnState(p, PawnState.ANYTHING);
                     }
 
-                    doctorSubroutine(p);
+                    doctorSubroutine(p, firstAwaiting);
                 }
                 else if (party)
                 {
