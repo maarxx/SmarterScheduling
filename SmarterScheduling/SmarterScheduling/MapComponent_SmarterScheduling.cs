@@ -11,6 +11,16 @@ namespace SmarterScheduling
     class MapComponent_SmarterScheduling : MapComponent
     {
 
+        public static bool enableLogging = false;
+
+        public void doLogging(string s)
+        {
+            if (enableLogging)
+            {
+                Log.Message(s);
+            }
+        }
+
         public enum PawnState
         {
             SLEEP,
@@ -568,11 +578,13 @@ namespace SmarterScheduling
 
                 if (gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE");
                     setPawnState(p, PawnState.ANYTHING);
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
                 else if (hungry && !sleeping && !needsTreatment)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "hungry && !sleeping && !needsTreatment");
                     setPawnState(p, PawnState.JOY, false);
                     if (shouldDisruptPawn(p))
                     {
@@ -595,11 +607,13 @@ namespace SmarterScheduling
                 }
                 else if (currentlyTreating)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "currentlyTreating");
                     setPawnState(p, PawnState.ANYTHING);
                     doctorNotLazy(p);
                 }
                 else if (anyoneAwaitingTreatment && isDoctor)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "anyoneAwaitingTreatment && isDoctor");
                     if (rest < 0.10f)
                     {
                         setPawnState(p, PawnState.SLEEP);
@@ -624,6 +638,7 @@ namespace SmarterScheduling
                 }
                 else if (party)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "party");
                     setPawnState(p, PawnState.ANYTHING);
                     if (!pawnAttendingParty(p))
                     {
@@ -639,80 +654,99 @@ namespace SmarterScheduling
                 }
                 else if (shouldChangeClothes)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "shouldChangeClothes");
                     setPawnState(p, PawnState.ANYTHING);
                 }
                 else if (rest < 0.32f)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "rest < 0.32f");
                     setPawnState(p, PawnState.SLEEP);
                     //if (!(layingDown || sleeping)) { tryToResetPawn(p); }
                 }
                 else if ((sleeping || stateSleep) && rest < 0.45f)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "(sleeping || stateSleep) && rest < 0.45f");
                     setPawnState(p, PawnState.SLEEP);
                 }
                 else if (mood < MAJOR_BREAK)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "mood < MAJOR_BREAK");
                     setPawnState(p, PawnState.JOY);
                     if (sleeping) { tryToResetPawn(p); }
                 }
                 else if (needsTreatment)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "needsTreatment");
                     setPawnState(p, PawnState.ANYTHING);
                 }
                 else if ((sleeping || stateSleep) && rest > 0.45f && mood < MINOR_BREAK)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "(sleeping || stateSleep) && rest > 0.45f && mood < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (p.needs.joy.CurLevel < 0.30f)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "p.needs.joy.CurLevel < 0.30f");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (curSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (justWokeRested)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "justWokeRested");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (stateJoy && p.needs.joy.CurLevel < 0.90f)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.CurLevel < 0.90f");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (manageMeditation && shouldMeditate)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "manageMeditation && shouldMeditate");
                     setPawnState(p, PawnState.MEDITATE);
                 }
                 else if ((stateJoy || stateMeditate) && joyHoldExtra && p.needs.beauty.GUIChangeArrow > 0)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && joyHoldExtra && p.needs.beauty.GUIChangeArrow > 0");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if ((stateJoy || stateMeditate) && joyHoldExtra && p.needs.comfort.GUIChangeArrow > 0)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && joyHoldExtra && p.needs.comfort.GUIChangeArrow > 0");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if ((stateJoy || stateMeditate) && p.needs.mood.GUIChangeArrow > 0)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && p.needs.mood.GUIChangeArrow > 0");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if ((stateJoy || stateMeditate) && p.needs.mood.CurLevel < MINOR_BREAK)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && p.needs.mood.CurLevel < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (sleeping || (doubleSleep && canSleep && (stateJoy || stateSleep || stateMeditate)))
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "sleeping || (doubleSleep && canSleep && (stateJoy || stateSleep || stateMeditate))");
                     setPawnState(p, PawnState.SLEEP);
                 }
                 else if (gainingImmunity && immuneSensitivity == ImmuneSensitivity.BALANCED)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "gainingImmunity && immuneSensitivity == ImmuneSensitivity.BALANCED");
                     setPawnState(p, PawnState.ANYTHING);
                 }
                 else if (isAnimalSleepTime && (isHandler = isPawnHandler(p)))
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "isAnimalSleepTime && (isHandler = isPawnHandler(p))");
                     if (canSleep)
                     {
                         setPawnState(p, PawnState.SLEEP);
@@ -724,6 +758,7 @@ namespace SmarterScheduling
                 }
                 else if (!isHandler && isDay && isPawnNightOwl(p))
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "!isHandler && isDay && isPawnNightOwl(p)");
                     if (canSleep)
                     {
                         setPawnState(p, PawnState.SLEEP);
@@ -735,19 +770,23 @@ namespace SmarterScheduling
                 }
                 else if (curSchedule == ScheduleType.MAXMOOD && canSleep)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && canSleep");
                     setPawnState(p, PawnState.SLEEP);
                 }
                 else if (curSchedule == ScheduleType.MAXMOOD)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (doubleEat && p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork && hasFood)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "doubleEat && p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork && hasFood");
                     setPawnState(p, PawnState.ANYTHING);
                     FoodUtility.IngestFromInventoryNow(p, invFood);
                 }
                 else
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "else [work]");
                     if (!stateWork && (p.CurJobDef.defName == "Meditate" || p.CurJobDef.defName == "Reign"))
                     {
                         setPawnState(p, PawnState.WORK);
@@ -761,6 +800,7 @@ namespace SmarterScheduling
 
                 if (layingDown && !sleeping && !needsTreatment)
                 {
+                    doLogging(p.Name.ToStringShort + ": " + "layingDown && !sleeping && !needsTreatment");
                     if (!(gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE))
                     {
                         if (pawnStates[p] == PawnState.JOY)
