@@ -329,12 +329,12 @@ namespace SmarterScheduling
                    && !p.health.InPainShock;
         }
 
-        public bool shouldDisruptPawn(Pawn p)
+        public bool shouldDisruptPawn(Pawn p, bool dontDisruptEating = true)
         {
             return pawnCanMove(p)
                    && !(p.Drafted)
                    && !(p.CurJob.playerForced)
-                   && !(p.CurJob.def == JobDefOf.Ingest)
+                   && !(dontDisruptEating && p.CurJob.def == JobDefOf.Ingest)
                    && !(p.CurJob.def == JobDefOf.Wear)
                    && !(p.CurJob.def == JobDefOf.RemoveApparel && p.CurJob.targetA.Thing is Apparel && ((Apparel)p.CurJob.targetA.Thing).Wearer != null);
         }
@@ -586,16 +586,16 @@ namespace SmarterScheduling
                 {
                     doLogging(p.Name.ToStringShort + ": " + "hungry && !sleeping && !needsTreatment");
                     setPawnState(p, PawnState.JOY, false);
-                    if (shouldDisruptPawn(p))
+                    if (shouldDisruptPawn(p, false))
                     {
                         if (recreation[p.Position])
                         {
                             shouldResetPawnOnHungry[p] = false;
                         }
 
-                        if (shouldResetPawnOnHungry[p] && pawnCanMove(p))
+                        if (shouldResetPawnOnHungry[p])
                         {
-                            restrictPawnToActivityArea(p, PawnState.JOY);
+                            restrictPawnToActivityArea(p, PawnState.JOY, true);
                         }
                         else
                         {
