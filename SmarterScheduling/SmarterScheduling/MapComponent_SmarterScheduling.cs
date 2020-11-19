@@ -556,10 +556,14 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.JOY, false);
                     if (shouldDisruptPawn(p))
                     {
+                        if (recreation[p.Position])
+                        {
+                            shouldResetPawnOnHungry[p] = false;
+                        }
+
                         if (shouldResetPawnOnHungry[p] && pawnCanMove(p))
                         {
                             restrictPawnToActivityArea(p, PawnState.JOY);
-                            shouldResetPawnOnHungry[p] = false;
                         }
                         else
                         {
