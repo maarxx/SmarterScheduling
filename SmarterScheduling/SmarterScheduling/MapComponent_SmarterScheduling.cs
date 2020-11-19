@@ -805,7 +805,7 @@ namespace SmarterScheduling
                     {
                         if (pawnStates[p] == PawnState.JOY)
                         {
-                            tryToResetPawn(p);
+                            //tryToResetPawn(p);
                         }
                         else if (!spoonFeeding && hungry)
                         {
