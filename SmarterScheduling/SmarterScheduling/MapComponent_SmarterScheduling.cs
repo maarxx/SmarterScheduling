@@ -231,6 +231,18 @@ namespace SmarterScheduling
             return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tame,80", "train,70" }, 15);
         }
 
+        public bool isPawnNightOwl(Pawn p)
+        {
+            foreach (Trait t in p.story.traits.allTraits)
+            {
+                if (t.def.defName == "NightOwl")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public bool doesPawnHaveWorkGiverAtPriority(Pawn p, string[] workGiverStrings, int minPriority)
         {
             int i = 0;
@@ -292,6 +304,12 @@ namespace SmarterScheduling
         {
             int hour = GenLocalDate.HourOfDay(map.Tile);
             return (hour >= 22 || hour <= 5);
+        }
+
+        public bool isDaytime()
+        {
+            int hour = GenLocalDate.HourOfDay(map.Tile);
+            return (hour >= 11 || hour <= 18);
         }
 
         public bool pawnCanMove(Pawn p)
@@ -484,6 +502,8 @@ namespace SmarterScheduling
             bool party = isThereAParty();
 
             bool isAnimalSleepTime = isAnimalSleepingTime();
+
+            bool isDay = isDaytime();
 
             isAnyPendingTreatments(out anyoneNeedingTreatment, out anyoneAwaitingTreatment, out firstAwaiting);
 
@@ -691,13 +711,27 @@ namespace SmarterScheduling
                 {
                     setPawnState(p, PawnState.ANYTHING);
                 }
-                else if (isAnimalSleepTime && (isHandler = isPawnHandler(p)) && canSleep)
+                else if (isAnimalSleepTime && (isHandler = isPawnHandler(p)))
                 {
-                    setPawnState(p, PawnState.SLEEP);
+                    if (canSleep)
+                    {
+                        setPawnState(p, PawnState.SLEEP);
+                    }
+                    else
+                    {
+                        setPawnState(p, PawnState.JOY);
+                    }
                 }
-                else if (isAnimalSleepTime && isHandler)
+                else if (!isHandler && isDay && isPawnNightOwl(p))
                 {
-                    setPawnState(p, PawnState.JOY);
+                    if (canSleep)
+                    {
+                        setPawnState(p, PawnState.SLEEP);
+                    }
+                    else
+                    {
+                        setPawnState(p, PawnState.JOY);
+                    }
                 }
                 else if (curSchedule == ScheduleType.MAXMOOD && canSleep)
                 {
