@@ -11,8 +11,6 @@ namespace SmarterScheduling
     class MapComponent_SmarterScheduling : MapComponent
     {
 
-        public static bool enableLogging = false;
-
         public void doLogging(string s)
         {
             if (enableLogging)
@@ -72,6 +70,8 @@ namespace SmarterScheduling
         public static JobGiver_OptimizeApparel apparelCheckerInstance;
         public static MethodInfo apparelCheckerMethod;
 
+        public bool enableLogging;
+
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
@@ -95,6 +95,8 @@ namespace SmarterScheduling
             this.manageMeditation = false;
 
             this.joyHoldExtra = false;
+
+            this.enableLogging = false;
 
             this.slowDown = 0;
             //initPlayerAreas();
