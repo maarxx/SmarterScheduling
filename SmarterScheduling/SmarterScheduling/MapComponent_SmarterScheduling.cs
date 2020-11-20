@@ -321,7 +321,7 @@ namespace SmarterScheduling
         public bool isDaytime()
         {
             int hour = GenLocalDate.HourOfDay(map.Tile);
-            return (hour >= 11 || hour <= 18);
+            return (hour >= 11 && hour <= 18);
         }
 
         public bool pawnCanMove(Pawn p)
