@@ -584,7 +584,7 @@ namespace SmarterScheduling
                     setPawnState(p, PawnState.ANYTHING);
                     if (anyoneNeedingTreatment && isDoctor) { doctorNotLazy(p); }
                 }
-                else if (hungry && !sleeping && !needsTreatment)
+                else if (hungry && !sleeping && !needsTreatment && !shouldChangeClothes)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "hungry && !sleeping && !needsTreatment");
                     setPawnState(p, PawnState.JOY, false);
