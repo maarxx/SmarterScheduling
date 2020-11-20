@@ -674,7 +674,7 @@ namespace SmarterScheduling
                 {
                     doLogging(p.Name.ToStringShort + ": " + "mood < MAJOR_BREAK");
                     setPawnState(p, PawnState.JOY);
-                    if (sleeping) { tryToResetPawn(p); }
+                    tryToResetPawn(p);
                 }
                 else if (needsTreatment)
                 {
