@@ -354,12 +354,18 @@ namespace SmarterScheduling
 
         }
 
-        public void resetAllSchedules(PawnState state)
+        public void resetSelectedPawnsSchedules(PawnState state)
         {
+            initPlayerAreas(out this.recreation, RECREATION_NAME);
+            initPlayerAreas(out this.meditation, MEDIDATION_NAME);
             initPawnsIntoCollection();
-            foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
+            foreach (object obj in Find.Selector.SelectedObjects)
             {
-                setPawnState(p, state);
+                if (obj is Pawn)
+                {
+                    Pawn p = (Pawn)obj;
+                    setPawnState(p, state);
+                }
             }
         }
 

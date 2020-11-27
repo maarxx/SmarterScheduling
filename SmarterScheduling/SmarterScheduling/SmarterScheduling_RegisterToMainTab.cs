@@ -58,7 +58,7 @@ namespace SmarterScheduling
             List<FloatMenuOption> menuResetAllSchedules = new List<FloatMenuOption>();
             foreach (MapComponent_SmarterScheduling.PawnState pawnState in Enum.GetValues(typeof(MapComponent_SmarterScheduling.PawnState)))
             {
-                menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().resetAllSchedules(pawnState); }));
+                menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().resetSelectedPawnsSchedules(pawnState); }));
             }
 
             List<FloatMenuOption> menuScheduleTypes = new List<FloatMenuOption>();
