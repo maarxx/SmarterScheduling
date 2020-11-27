@@ -90,7 +90,7 @@ namespace SmarterScheduling
             buttons.Add(new ModButton_Text(
                 delegate
                 {
-                    return "Reset All Pawn's" + Environment.NewLine + "Schedules to ...";
+                    return "Reset All Selected" + Environment.NewLine + "Pawn's Schedules to ...";
                 },
                 delegate {
                     Find.WindowStack.Add(new FloatMenu(menuResetAllSchedules));
