@@ -240,7 +240,7 @@ namespace SmarterScheduling
 
         public bool isPawnHandler(Pawn p)
         {
-            return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tame,80", "train,70" }, 15);
+            return doesPawnHaveWorkGiverAtPriority(p, new string[] { "tame,80", "train,70" }, 25);
         }
 
         public bool isPawnNightOwl(Pawn p)
