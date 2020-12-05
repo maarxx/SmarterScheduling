@@ -546,7 +546,7 @@ namespace SmarterScheduling
                 bool sleeping = (p.needs.rest.GUIChangeArrow > 0);
                 bool justWokeRested = !sleeping && (p.needs.rest.CurLevel > 0.95f);
                 
-                bool hungry = (p.needs.food.CurLevel < 0.29f);
+                bool hungry = (p.needs.food.CurLevel < 0.31f);
                 if (!hungry) { shouldResetPawnOnHungry[p] = true; }
 
                 bool shouldEatBeforeWork = (p.needs.food.CurLevel < 0.70f);
@@ -670,6 +670,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "rest < 0.32f");
                     setPawnState(p, PawnState.SLEEP);
                     //if (!(layingDown || sleeping)) { tryToResetPawn(p); }
+                    if (p.CurJobDef == JobDefOf.Meditate) { tryToResetPawn(p); }
                 }
                 else if ((sleeping || stateSleep) && rest < 0.45f)
                 {
