@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Alert_SwitchedOff.cs" />
-    <Compile Include="MainTabWindow_SmarterScheduling.cs" />
+    <Compile Include="SmarterScheduling_RegisterToMainTab.cs" />
     <Compile Include="MapComponent_SmarterScheduling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -44,6 +44,10 @@
     <Content Include="SmarterSchedulingTab.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
@@ -54,6 +58,10 @@
     </Reference>
     <Reference Include="ISharpZipLib">
       <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\ISharpZipLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModButtons">
+      <HintPath>..\..\..\ModButtons\Assemblies\ModButtons.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Posix">
