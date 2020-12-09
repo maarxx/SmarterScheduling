@@ -2,7 +2,7 @@
 
 This is a mod for the game RimWorld by Ludeon Studios.
 
-It automatically manages your Pawn's Sleep, Joy, and Work cycles.
+It automatically manages your Pawn's Sleep, Recreation, and Work cycles.
 
 # Table of Contents
 
