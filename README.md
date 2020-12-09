@@ -4,6 +4,10 @@ This is a mod for the game RimWorld by Ludeon Studios.
 
 It automatically manages your Pawn's Sleep, Recreation, and Work cycles.
 
+# Dependency
+
+This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModButtons)
+
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -130,6 +134,10 @@ In "Feed Themselves" mode, if a colonist is resting in bed, and gets hungry, we 
 The setting "Hungry Patients" is dependent upon setting for "Immunity Handling", when relevant. If Hungry Patients is "Feed Themselves" but Immunity Handling is "Sensitive", then patients only resting for missing health will feed themselves, but patients resting for immunity will wait to be fed.
 
 # Advanced Details
+
+#### Other Edge Cases I've Probably Forgotten
+
+There's other edge cases here that we handle pretty well. If you've got any head for reading a little code, the actual implementation is pretty human-readable. You can find it over here: [the actual code routine](./SmarterScheduling/SmarterScheduling/MapComponent_SmarterScheduling.cs#L587-L808)
 
 #### Really Bad Moods, like Addiction Withdrawl
 
