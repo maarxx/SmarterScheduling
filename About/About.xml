@@ -3,7 +3,7 @@
   <name>SmarterScheduling</name>
   <author>Maarx</author>
   <url>https://github.com/maarxx/SmarterScheduling/</url>
-  <description>Automatically manages your Pawn's Sleep, Joy, and Work cycles.</description>
+  <description>Automatically manages your Pawn's Sleep, Recreation, and Work cycles.</description>
   <packageId>maarx.smarterscheduling</packageId>
   <supportedVersions>
     <li>1.2</li>
