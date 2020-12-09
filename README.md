@@ -137,7 +137,7 @@ The setting "Hungry Patients" is dependent upon setting for "Immunity Handling",
 
 #### Other Edge Cases I've Probably Forgotten
 
-There's other edge cases here that we handle pretty well. If you've got any head for reading a little code, the actual implementation is pretty human-readable. You can find it over here: [the actual code routine](./SmarterScheduling/MapComponent_SmarterScheduling.cs#L587-L808)
+There's other edge cases here that we handle pretty well. If you've got any head for reading a little code, the actual implementation is pretty human-readable. You can find it over here: [the actual code routine](./SmarterScheduling/SmarterScheduling/MapComponent_SmarterScheduling.cs#L587-L808)
 
 #### Really Bad Moods, like Addiction Withdrawl
 
