@@ -708,9 +708,9 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "justWokeRested");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.joy.CurLevel < 0.90f)
+                else if (stateJoy && p.needs.joy.CurLevel < 0.80f)
                 {
-                    doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.CurLevel < 0.90f");
+                    doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.CurLevel < 0.80f");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f)
