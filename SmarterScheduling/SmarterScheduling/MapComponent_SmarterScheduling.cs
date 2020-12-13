@@ -45,6 +45,7 @@ namespace SmarterScheduling
         public const string MEDIDATION_NAME = "Medi";
 
         public Dictionary<Pawn, PawnState> pawnStates;
+        public Dictionary<Pawn, ScheduleType> pawnSchedules;
         public Dictionary<Pawn, bool> shouldResetPawnOnHungry;
         public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorResetTick;
@@ -57,8 +58,6 @@ namespace SmarterScheduling
         public bool enabled;
         public ImmuneSensitivity immuneSensitivity;
         public bool spoonFeeding;
-
-        public ScheduleType curSchedule;
 
         public bool doubleSleep;
         public bool doubleEat;
@@ -75,6 +74,7 @@ namespace SmarterScheduling
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.pawnStates = new Dictionary<Pawn, PawnState>();
+            this.pawnSchedules = new Dictionary<Pawn, ScheduleType>();
             this.shouldResetPawnOnHungry = new Dictionary<Pawn, bool>();
             this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorResetTick = new Dictionary<Pawn, int>();
@@ -82,8 +82,6 @@ namespace SmarterScheduling
             this.enabled = false;
             this.immuneSensitivity = ImmuneSensitivity.SENSITIVE;
             this.spoonFeeding = true;
-
-            this.curSchedule = ScheduleType.WORK;
 
             apparelCheckerInstance = new JobGiver_OptimizeApparel();
             apparelCheckerMethod = apparelCheckerInstance.GetType().
@@ -157,6 +155,10 @@ namespace SmarterScheduling
                 if (!pawnStates.ContainsKey(p))
                 {
                     pawnStates.Add(p, PawnState.ANYTHING);
+                }
+                if (!pawnSchedules.ContainsKey(p))
+                {
+                    pawnSchedules.Add(p, ScheduleType.WORK);
                 }
                 if (!shouldResetPawnOnHungry.ContainsKey(p))
                 {
@@ -369,6 +371,21 @@ namespace SmarterScheduling
             }
         }
 
+        public void resetSelectedPawnsScheduleTypes(ScheduleType type)
+        {
+            initPlayerAreas(out this.recreation, RECREATION_NAME);
+            initPlayerAreas(out this.meditation, MEDIDATION_NAME);
+            initPawnsIntoCollection();
+            foreach (object obj in Find.Selector.SelectedObjects)
+            {
+                if (obj is Pawn)
+                {
+                    Pawn p = (Pawn)obj;
+                    pawnSchedules.SetOrAdd(p, type);
+                }
+            }
+        }
+
         public void setPawnState(Pawn p, PawnState state, bool doRestriction = true)
         {
             pawnStates[p] = state;
@@ -562,6 +579,8 @@ namespace SmarterScheduling
 
                 bool canSleep = (rest < 0.74f);
 
+                ScheduleType pawnSchedule = pawnSchedules.TryGetValue(p, ScheduleType.WORK);
+
                 bool stateSleep = (pawnStates[p] == PawnState.SLEEP);
                 bool stateJoy = (pawnStates[p] == PawnState.JOY);
                 bool stateWork = (pawnStates[p] == PawnState.WORK);
@@ -698,7 +717,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "p.needs.joy.CurLevel < 0.30f");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (curSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK)
+                else if (pawnSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
@@ -708,9 +727,9 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "justWokeRested");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.joy.CurLevel < 0.90f)
+                else if (stateJoy && p.needs.joy.CurLevel < 0.80f)
                 {
-                    doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.CurLevel < 0.90f");
+                    doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.CurLevel < 0.80f");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f)
@@ -777,12 +796,12 @@ namespace SmarterScheduling
                         setPawnState(p, PawnState.JOY);
                     }
                 }
-                else if (curSchedule == ScheduleType.MAXMOOD && canSleep)
+                else if (pawnSchedule == ScheduleType.MAXMOOD && canSleep)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && canSleep");
                     setPawnState(p, PawnState.SLEEP);
                 }
-                else if (curSchedule == ScheduleType.MAXMOOD)
+                else if (pawnSchedule == ScheduleType.MAXMOOD)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD");
                     setPawnState(p, PawnState.JOY);

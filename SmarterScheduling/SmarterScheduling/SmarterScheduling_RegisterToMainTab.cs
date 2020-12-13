@@ -61,10 +61,10 @@ namespace SmarterScheduling
                 menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().resetSelectedPawnsSchedules(pawnState); }));
             }
 
-            List<FloatMenuOption> menuScheduleTypes = new List<FloatMenuOption>();
+            List<FloatMenuOption> menuResetAllScheduleTypes = new List<FloatMenuOption>();
             foreach (MapComponent_SmarterScheduling.ScheduleType scheduleType in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ScheduleType)))
             {
-                menuScheduleTypes.Add(new FloatMenuOption(scheduleType.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().curSchedule = scheduleType; }));
+                menuResetAllScheduleTypes.Add(new FloatMenuOption(scheduleType.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().resetSelectedPawnsScheduleTypes(scheduleType); }));
             }
 
             List<ModButton_Text> buttons = new List<ModButton_Text>();
@@ -126,10 +126,10 @@ namespace SmarterScheduling
             buttons.Add(new ModButton_Text(
                 delegate
                 {
-                    return "Schedule Type is:" + Environment.NewLine + getComponent().curSchedule.ToString().ToLower().CapitalizeFirst();
+                    return "Reset All Selected" + Environment.NewLine + "Pawn's Schedule Types to ...";
                 },
                 delegate {
-                    Find.WindowStack.Add(new FloatMenu(menuScheduleTypes));
+                    Find.WindowStack.Add(new FloatMenu(menuResetAllScheduleTypes));
                 }
             ));
             buttons.Add(new ModButton_Text(

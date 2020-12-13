@@ -35,6 +35,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Alert_PawnsMaxMood.cs" />
     <Compile Include="Alert_SwitchedOff.cs" />
     <Compile Include="SmarterScheduling_RegisterToMainTab.cs" />
     <Compile Include="MapComponent_SmarterScheduling.cs" />
