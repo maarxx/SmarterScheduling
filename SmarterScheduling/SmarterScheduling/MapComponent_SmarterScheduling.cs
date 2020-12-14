@@ -592,6 +592,8 @@ namespace SmarterScheduling
 
                 bool isHandler = false;
 
+                bool recreationExists = recreation.TrueCount > 0;
+
                 bool currentlyTreating = false;
                 bool needsTreatment = false;
                 bool isDoctor = false;
@@ -620,7 +622,7 @@ namespace SmarterScheduling
                             shouldResetPawnOnHungry[p] = false;
                         }
 
-                        if (shouldResetPawnOnHungry[p])
+                        if (recreationExists && shouldResetPawnOnHungry[p])
                         {
                             restrictPawnToActivityArea(p, PawnState.JOY, true);
                         }
@@ -700,7 +702,7 @@ namespace SmarterScheduling
                 {
                     doLogging(p.Name.ToStringShort + ": " + "mood < MAJOR_BREAK");
                     setPawnState(p, PawnState.JOY);
-                    if (!recreation[p.Position]) { tryToResetPawn(p); }
+                    if (recreationExists && !recreation[p.Position]) { tryToResetPawn(p); }
                 }
                 else if (needsTreatment)
                 {
