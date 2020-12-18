@@ -103,6 +103,16 @@ This mod also assumes that your doctors have doctoring as their highest relevant
 
 The mod does not explicitly force job assignments ("Prioritize"), it just sets doctor schedules and resets doctors as needed and hopes the doctors, upon being reset, do the right thing.
 
+## Handlers and Night Owls
+
+Since pawns using Smarter Scheduling might have a schedule that isn't exactly 24-hours anymore, it might rotate around the clock over days/weeks/years. This is usually okay, but there's a couple cases where it matters.
+
+We look out for Animal Handlers, and if they're awake during animal sleeping hours, we just hold them in Recreation/Sleep to keep them ready to go for when the animals wake up, to give them maximum hours with the animals.
+
+We look out for Night Owls, and do the opposite. We try to get them to sleep during the day, and if they can't, we hold them in Joy during their worst hours, so they're ready to go out for effective work the moment the debuff goes away, which hopefully syncs them up back into a good schedule for the next day.
+
+If the pawn is both an Animal Handler and a Night Owl, the Animal Handler gets priority. Sorry dude. Daytime work for you.
+
 ## Medical Conditions Not Requiring Treatment
 
 An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
@@ -129,11 +139,25 @@ In "Feed Themselves" mode, if a colonist is resting in bed, and gets hungry, we 
 
 The setting "Hungry Patients" is dependent upon setting for "Immunity Handling", when relevant. If Hungry Patients is "Feed Themselves" but Immunity Handling is "Sensitive", then patients only resting for missing health will feed themselves, but patients resting for immunity will wait to be fed.
 
+#### Reset All Selected Pawn's Schedules to ...
+
+This button lets you nudge a pawn's schedule into another state. If SmarterScheduling is currently turned off, it will obviously "stick". Useful to force everybody to Work for a while without SmarterScheduling at all. If SmarterScheduling is turned on, this nudge might "stick" or might get overriden back on the next cycle, based on conditions.
+
+#### Reset All Selected Pawn's Schedule Types to ...
+
+This one (Schedule **TYPES**) is very different, and offers two options: traditional "Work", or exceptional "MaxMood". Work is the normal behavior. "MaxMood" entirely skips Work and keeps the selected pawns exclusively in Sleep or Recreation. It is useful for maximizing moods right before an attack, or right before preparing a caravan or something. You will get an alert while colonists are in MaxMood.
+
 # Advanced Details
 
-#### Other Edge Cases I've Probably Forgotten
+#### Sleep Cycles Per Work
+#### Eat Cycles Per Work
+#### Joy Hold Extra
 
-There's other edge cases here that we handle pretty well. If you've got any head for reading a little code, the actual implementation is pretty human-readable. You can find it over here: [the actual code routine](./SmarterScheduling/SmarterScheduling/MapComponent_SmarterScheduling.cs#L587-L808)
+These settings are experimental edge cases and probably aren't worth using.
+
+Sleep/Eat can be set to a double schedule where they will sleep or eat an extra time before being sent out to work, only useful if their work is very far away (think opposite corner of a very large map).
+
+Joy Hold Extra is a latch that will hold them in Recreation a little longer if their Recreation and Mood is maximized but their Beauty / Comfort might still be increasing. Useful to squeeze out a tiny bit more mood. Questionably worthwhile.
 
 #### Really Bad Moods, like Addiction Withdrawl
 
@@ -150,6 +174,10 @@ But if a pawn is having the worst time (think addiction withdrawl), then their m
 This is probably the behavior that you want anyway. You are certainly no worse off than removing their legs. In many cases, this behavior is powerful enough to pull a pawn through an addiction and keep both their legs intact.
 
 Consider temporarily installing a production workbench inside Joy to keep them busy and productive, with a stockpile so that other pawns haul in the supplies they'll need.
+
+#### Other Edge Cases I've Probably Forgotten
+
+There's other edge cases here that we handle pretty well. If you've got any head for reading a little code, the actual implementation is pretty human-readable. You can find it over here: [the actual code routine](./SmarterScheduling/SmarterScheduling/MapComponent_SmarterScheduling.cs#L587-L808)
 
 # How to Install
 
