@@ -103,6 +103,16 @@ This mod also assumes that your doctors have doctoring as their highest relevant
 
 The mod does not explicitly force job assignments ("Prioritize"), it just sets doctor schedules and resets doctors as needed and hopes the doctors, upon being reset, do the right thing.
 
+## Handlers and Night Owls
+
+Since pawns using Smarter Scheduling might have a schedule that isn't exactly 24-hours anymore, it might rotate around the clock over days/weeks/years. This is usually okay, but there's a couple cases where it matters.
+
+We look out for Animal Handlers, and if they're awake during animal sleeping hours, we just hold them in Recreation/Sleep to keep them ready to go for when the animals wake up, to give them maximum hours with the animals.
+
+We look out for Night Owls, and do the opposite. We try to get them to sleep during the day, and if they can't, we hold them in Joy during their worst hours, so they're ready to go out for effective work the moment the debuff goes away, which hopefully syncs them up back into a good schedule for the next day.
+
+If the pawn is both an Animal Handler and a Night Owl, the Animal Handler gets priority. Sorry dude. Daytime work for you.
+
 ## Medical Conditions Not Requiring Treatment
 
 An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
