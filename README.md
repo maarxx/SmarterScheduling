@@ -29,19 +29,9 @@ You know exactly how you want your Pawns to behave. We all want roughly the same
 
 You want them to go to sleep when they are tired, and then wake up when they are rested. Easy enough.
 
-Then you want them to go to your Dining Room / Recreation Room, to Eat and to Joy to improve their Mood for a while. This room also has great Beauty, Comfort, and Space. They love it here. Their Moods start to improve.
-
-Then their Recreation hits maximum.
-
-But this is where it starts to go wrong.
-
-They leave the room as soon as their Recreation is full, even if their overall Mood is still low. They had great scores in Beauty, Comfort, and Space, but the deltas hadn't yet caught up, and you wanted them to stay a little longer, even after their Recreation was full.
-
-You wanted them to stay until their overall Mood had caught up with the awesome room. Only THEN did you want them to leave.
+Then you want them to go to your Dining Room / Recreation Room, to Eat and to Recreation to improve their Mood for a while.
 
 Then you want them to go Work for a while, ideally continuously until they have to Sleep. And then repeat the process.
-
-And if, while they're out, their Recreation or overall Mood hits a critically low threshold, you want them to go back to your awesome Dining / Recreation room, and stay there, *not* just until thier *Recreation* is full, but until their *overall Mood* has peaked.
 
 #### The concept is simple, but this is difficult to execute in vanilla.
 
@@ -51,6 +41,8 @@ But the tool just isn't up to the task. What you want is just a little too compl
 
 You try to find the right balance, but it's just not the right tool for the job, and whenever your balance is a bit off, you either specify too much Recreation causing your Pawns to waste time pinging back to your Recreation Room repeatedly, or you specify too little Recreation causing your prize Doctor to go berserk and get his arm blown off by your Sniper.
 
+Whenever something happens to offset the schedule (like an emergency or combat), suddenly everybody's schedules are off, and they're trying to do the wrong thing at the wrong time. But it shouldn't be that hard to get them to do the right things!
+
 #### Enter Smarter Scheduling
 
 This mod implements exactly that behavior we all want. Automatically.
@@ -59,13 +51,13 @@ This mod implements exactly that behavior we all want. Automatically.
 
 You'll add the mod. You'll enable the mod. By default, it won't do anything. That's okay.
 
-Within the game, it adds a MainTab, probably in the far-bottom-right-corner, labeled "ModButtons", with a button to turn the whole thing ON or OFF.
+The dependency "ModButtons" will add a similarly-named tab in the bottom-right corner, with some control buttons.
 
 You'll probably want to turn this one ON for most of the time. You might turn it OFF during real emergencies, but then you'll probably turn it back ON after the crisis has been addressed.
 
 It will default back to OFF when you Save/Load, so remember to turn it back ON each time.
 
-While it is ON, the mod will automatically manage each pawn's Sleep / Recreation / Work schedules. You can open the Restrict tab and watch it work.
+While it is ON, the mod will automatically manage each pawn's Sleep / Recreation / Work schedules. You can open the Schedule tab and watch it work.
 
 The mod doesn't care what time it is, and doesn't worry about future scheduling -- it updates each pawn's whole schedule block to one uniform task/color, and then constantly changes it on the fly.
 
@@ -76,12 +68,12 @@ As soon as you have a good Recreation / Dining room, which provides excellent mo
 The cycle you'll see looks something like this:
 
 * The pawn will be sent to Sleep when they are tired.
-* When they wake, they will probably be hungry, so they'll be pinged to Joy for a moment to find the dining room, then released to find food. They should eat at the table.
-* Once they're fed, the mod will hold them in Recreation, and will restrict them to Joy that you've specified.
-* The pawn will be held in Joy, not just until their Recreation is maximized, but until their Beauty, Comfort, Space, and overall Mood is maximized.
+* When they wake, they will probably be hungry, so they'll be pinged to Joy for a moment to find the dining room, then released to find food. This should make them eat at the table.
+* Once they're fed, the mod will put them in Recreation, and will restrict them to Joy that you've specified.
+* The pawn will be held in Joy, not just until their Recreation is maximized, but until their overall Mood is maximized.
 * Then it will set them to Work, and release them from Joy, back to whatever Area you had previously set.
 
-You'll notice that with maximized Mood, Beauty, Comfort, Space, Rest, and Food, that your pawn is able to work continously for a very long time, and will get lots and lots of stuff done.
+You'll notice that with maximized Mood, that your pawn is able to work continously for a very long time, and will get lots and lots of stuff done.
 
 Ideally, your pawn will stay out until Rest gets low, and then the mod will send them to Sleep, and then repeat the process.
 
@@ -107,13 +99,15 @@ While somebody needs medical treatment, all doctors are set to schedule of "Anyt
 
 As a side effect of this, you will notice that your doctor's response times have improved, and pawns overall receive medical treatment in a much quicker and snappier fashion, possibly even improving disease survival rates.
 
-This mod also assumes that your doctors have doctoring as their highest relevant priority. If you have something as a higher priority, the mod will get confused as to why nobody is providing treatment, and start chain-resetting your doctors. This is typically indicative of an incorrect work tab, anyway.
+This mod also assumes that your doctors have doctoring as their highest relevant priority. If you have something as a higher priority, the mod will get confused as to why nobody is providing treatment, and start chain-resetting your doctors. This is typically indicative of an incorrect Work tab, anyway.
+
+The mod does not explicitly force job assignments ("Prioritize"), it just sets doctor schedules and resets doctors as needed and hopes the doctors, upon being reset, do the right thing.
 
 ## Medical Conditions Not Requiring Treatment
 
 An interesting case is medical conditions that result in bed rest but do not require immediate treatment. This includes generally missing Health, for injuries that have already been Treated, and Treated Diseases with Immunity, such as Plague / Malaria / Flu / etc.
 
-These conditions are very disruptive to your colony. Your pawn lays in bed, and does nothing, and furthermore disrupts other colonists to feed them. Sometimes, you want this, especially with Immunity, but sometimes, they need to get their asses out of bed every now and then, to feed themselves, or go to Psyche for Joy and Mood before they suffer a mental break in your Hospital or Dormitory.
+These conditions are very disruptive to your colony. Your pawn lays in bed, and does nothing, and furthermore disrupts other colonists to feed them. Sometimes, you want this, especially with Immunity, but sometimes, they need to get their asses out of bed every now and then, to feed themselves, or go to Joy for Recreation and Mood before they suffer a mental break in your Hospital or Dormitory.
 
 Therefore, the mod provides two more options for how such cases should be handled:
 
@@ -151,25 +145,11 @@ So if you see a pawn spending a long time in your Recreation/Joy room, take a lo
 
 Typically, a pawn kept in Joy will increase until their Mood has stopped increasing, which is typically a very good Mood, and then they will be released automatically.
 
-But if a pawn is having the worst time (think addiction withdrawl), then their mood might stop increasing even while it is still very low. The mod has a minimum threshold, it will not release pawns from Joy until they are at least over their Minor Break threshold by an amount. If even your best Dining/Recreation room cannot get them past that threshold, the mod will hold them in Psyche indefinitely, except to Sleep and Eat.
+But if a pawn is having the worst time (think addiction withdrawl), then their mood might stop increasing even while it is still very low. The mod has a minimum threshold, it will not release pawns from Joy until they are at least over their Minor Break threshold by an amount. If even your best Dining/Recreation room cannot get them past that threshold, the mod will hold them in Joy indefinitely, except to Sleep and Eat.
 
 This is probably the behavior that you want anyway. You are certainly no worse off than removing their legs. In many cases, this behavior is powerful enough to pull a pawn through an addiction and keep both their legs intact.
 
 Consider temporarily installing a production workbench inside Joy to keep them busy and productive, with a stockpile so that other pawns haul in the supplies they'll need.
-
-#### Technical Summary
-
-In summary, your Pawn can be sent to Psyche for any of these three reasons:
-
-1. Having just woken up from a complete and restful Sleep.
-2. Having an overall Mood dropped below the threshold.
-3. Having a Recreation dropped below the threshold.
-
-Regardless of which reason it was, the next result is the same: Your Pawn will remain in Psyche until *all three* of the following conditions are met:
-
-1. His Recreation is over the the threshold.
-2. His overall Mood is over the threshold.
-3. His overall Mood has stopped increasing.
 
 # How to Install
 
