@@ -25,13 +25,13 @@ This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModBut
 
 #### Okay, let's be honest. We all want the same thing.
 
-You know exactly how you want your Pawns to behave. We all want roughly the same thing.
+You know exactly how you want your pawns to behave. We all want roughly the same thing.
 
 You want them to go to sleep when they are tired, and then wake up when they are rested. Easy enough.
 
-Then you want them to go to your Dining Room / Recreation Room, to Eat and to Recreation to improve their Mood for a while.
+Then you want them to go to your Dining Room / Recreation Room, to eat and to recreation to improve their mood for a while.
 
-Then you want them to go Work for a while, ideally continuously until they have to Sleep. And then repeat the process.
+Then you want them to go work for a while, ideally continuously until they have to sleep. And then repeat the process.
 
 #### The concept is simple, but this is difficult to execute in vanilla.
 
@@ -39,7 +39,7 @@ This is exactly what you are trying to acheive with that clunky little Scheduler
 
 But the tool just isn't up to the task. What you want is just a little too complicated, and you can't ever quite get it right.
 
-You try to find the right balance, but it's just not the right tool for the job, and whenever your balance is a bit off, you either specify too much Recreation causing your Pawns to waste time pinging back to your Recreation Room repeatedly, or you specify too little Recreation causing your prize Doctor to go berserk and get his arm blown off by your Sniper.
+You try to find the right balance, but it's just not the right tool for the job, and whenever your balance is a bit off, you either specify too much Recreation causing your pawns to waste time pinging back to your Recreation Room repeatedly, or you specify too little Recreation causing your prize doctor to go berserk and get his arm blown off by your sniper.
 
 Whenever something happens to offset the schedule (like an emergency or combat), suddenly everybody's schedules are off, and they're trying to do the wrong thing at the wrong time. But it shouldn't be that hard to get them to do the right things!
 
