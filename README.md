@@ -4,6 +4,8 @@ This is a mod for the game RimWorld by Ludeon Studios.
 
 It automatically manages your Pawn's Sleep, Recreation, and Work cycles.
 
+We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324536212
+
 # Dependency
 
 This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModButtons)
