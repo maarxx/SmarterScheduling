@@ -560,9 +560,9 @@ namespace SmarterScheduling
                 float MINOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMinor + 0.02f;
 
                 bool layingDown = (p.CurJob.def.reportString == "lying down.");
-                bool sleeping = (p.needs.rest.GUIChangeArrow > 0);
-                bool justWokeRested = !sleeping && (p.needs.rest.CurLevel > 0.95f);
-                
+                bool sleeping = (p.needs.rest?.GUIChangeArrow > 0) || false;
+                bool justWokeRested = !sleeping && (p.needs.rest?.CurLevel > 0.95f) || false;
+
                 bool hungry = (p.needs.food.CurLevel < 0.31f);
                 if (!hungry) { shouldResetPawnOnHungry[p] = true; }
 
@@ -570,8 +570,10 @@ namespace SmarterScheduling
                 Thing invFood = FoodUtility.BestFoodInInventory(p);
                 bool hasFood = (invFood != null);
 
-                float rest = p.needs.rest.CurLevel;
-                float joy = p.needs.rest.CurLevel;
+                float? rest = p.needs.rest?.CurLevel;
+                if (rest == null) { rest = 1.0f; }
+                float? joy = p.needs.rest?.CurLevel;
+                if (joy == null) { joy = 1.0f; }
                 float mood = p.needs.mood.CurLevel;
 
                 object changeClothesJob = apparelCheckerMethod.Invoke(apparelCheckerInstance, new object[] { p });
