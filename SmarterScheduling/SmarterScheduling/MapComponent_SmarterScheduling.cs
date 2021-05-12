@@ -555,9 +555,20 @@ namespace SmarterScheduling
             List<Pawn> pawns = map.mapPawns.FreeColonistsSpawned.ListFullCopy();
             foreach (Pawn p in pawns)
             {
-                float EXTREME_BREAK = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02f;
-                float MAJOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02f;
-                float MINOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMinor + 0.02f;
+                doLogging(p.Name.ToStringShort + ": BEGIN");
+
+                float EXTREME_BREAK = 0f;
+                float MAJOR_BREAK = 0f;
+                float MINOR_BREAK = 0f;
+
+                try
+                {
+                    EXTREME_BREAK = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02f;
+                    MAJOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02f;
+                    MINOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMinor + 0.02f;
+                } catch (Exception) {
+                    // Do nothing, like for androids.
+                }
 
                 bool layingDown = (p.CurJob.def.reportString == "lying down.");
                 bool sleeping = (p.needs.rest?.GUIChangeArrow > 0) || false;
@@ -570,11 +581,19 @@ namespace SmarterScheduling
                 Thing invFood = FoodUtility.BestFoodInInventory(p);
                 bool hasFood = (invFood != null);
 
-                float? rest = p.needs.rest?.CurLevel;
-                if (rest == null) { rest = 1.0f; }
-                float? joy = p.needs.rest?.CurLevel;
-                if (joy == null) { joy = 1.0f; }
-                float mood = p.needs.mood.CurLevel;
+                float rest = 1.0f;
+                float joy = 1.0f;
+                float mood = 1.0f;
+
+                try
+                {
+                    rest = (float)p.needs.rest?.CurLevel;
+                    joy = (float)p.needs.joy?.CurLevel;
+                    mood = (float)p.needs.mood?.CurLevel;
+                }
+                catch (Exception) {
+                    // Do nothing, like for androids.
+                }
 
                 object changeClothesJob = apparelCheckerMethod.Invoke(apparelCheckerInstance, new object[] { p });
                 bool shouldChangeClothes = changeClothesJob != null;
