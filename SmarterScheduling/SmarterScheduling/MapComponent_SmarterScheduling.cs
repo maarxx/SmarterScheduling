@@ -330,7 +330,8 @@ namespace SmarterScheduling
         {
             return p.health.capacities.CanBeAwake
                    && p.health.capacities.GetLevel(PawnCapacityDefOf.Moving) > 0.16F
-                   && !p.health.InPainShock;
+                   && !p.health.InPainShock
+                   && !p.InMentalState;
         }
 
         public bool shouldDisruptPawn(Pawn p, bool dontDisruptEating = true)
