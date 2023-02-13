@@ -556,24 +556,56 @@ namespace SmarterScheduling
             List<Pawn> pawns = map.mapPawns.FreeColonistsSpawned.ListFullCopy();
             foreach (Pawn p in pawns)
             {
-                float EXTREME_BREAK = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02f;
-                float MAJOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02f;
-                float MINOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMinor + 0.02f;
+                doLogging(p.Name.ToStringShort + ": BEGIN");
+
+                float EXTREME_BREAK = 0f;
+                float MAJOR_BREAK = 0f;
+                float MINOR_BREAK = 0f;
+
+                try
+                {
+                    EXTREME_BREAK = p.mindState.mentalBreaker.BreakThresholdExtreme + 0.02f;
+                    MAJOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMajor + 0.02f;
+                    MINOR_BREAK = p.mindState.mentalBreaker.BreakThresholdMinor + 0.02f;
+                } catch (Exception) {
+                    // Do nothing, like for androids.
+                }
 
                 bool layingDown = (p.CurJob.def.reportString == "lying down.");
-                bool sleeping = (p.needs.rest.GUIChangeArrow > 0);
-                bool justWokeRested = !sleeping && (p.needs.rest.CurLevel > 0.95f);
-                
-                bool hungry = (p.needs.food.CurLevel < 0.31f);
-                if (!hungry) { shouldResetPawnOnHungry[p] = true; }
+                bool sleeping = (p.needs.rest?.GUIChangeArrow > 0) || false;
+                bool justWokeRested = !sleeping && (p.needs.rest?.CurLevel > 0.95f) || false;
 
-                bool shouldEatBeforeWork = (p.needs.food.CurLevel < 0.70f);
-                Thing invFood = FoodUtility.BestFoodInInventory(p);
-                bool hasFood = (invFood != null);
+                bool hungry = false;
+                bool shouldEatBeforeWork = false;
+                bool hasFood = false;
+                Thing invFood = null;
 
-                float rest = p.needs.rest.CurLevel;
-                float joy = p.needs.rest.CurLevel;
-                float mood = p.needs.mood.CurLevel;
+                try
+                {
+                    hungry = (p.needs.food.CurLevel < 0.31f);
+                    if (!hungry) { shouldResetPawnOnHungry[p] = true; }
+
+                    shouldEatBeforeWork = (p.needs.food.CurLevel < 0.70f);
+                    invFood = FoodUtility.BestFoodInInventory(p);
+                    hasFood = (invFood != null);
+                }
+                catch (Exception) {
+                    // Do nothing, like with androids.
+                }
+
+                float rest = 1.0f;
+                float joy = 1.0f;
+                float mood = 1.0f;
+
+                try
+                {
+                    rest = (float)p.needs.rest?.CurLevel;
+                    joy = (float)p.needs.joy?.CurLevel;
+                    mood = (float)p.needs.mood?.CurLevel;
+                }
+                catch (Exception) {
+                    // Do nothing, like for androids.
+                }
 
                 object changeClothesJob = apparelCheckerMethod.Invoke(apparelCheckerInstance, new object[] { p });
                 bool shouldChangeClothes = changeClothesJob != null;
@@ -715,7 +747,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "(sleeping || stateSleep) && rest > 0.45f && mood < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (p.needs.joy.CurLevel < 0.30f)
+                else if (joy < 0.30f)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "p.needs.joy.CurLevel < 0.30f");
                     setPawnState(p, PawnState.JOY);
@@ -730,12 +762,12 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "justWokeRested");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.joy.CurLevel < 0.80f)
+                else if (stateJoy && joy < 0.80f)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.CurLevel < 0.80f");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f)
+                else if (stateJoy && (p.needs.joy?.GUIChangeArrow > 0) && joy < 1f)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "stateJoy && p.needs.joy.GUIChangeArrow > 0 && p.needs.joy.CurLevel < 1f");
                     setPawnState(p, PawnState.JOY);
@@ -745,22 +777,22 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "manageMeditation && shouldMeditate");
                     setPawnState(p, PawnState.MEDITATE);
                 }
-                else if ((stateJoy || stateMeditate) && joyHoldExtra && p.needs.beauty.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && joyHoldExtra && (p.needs.beauty?.GUIChangeArrow > 0))
                 {
                     doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && joyHoldExtra && p.needs.beauty.GUIChangeArrow > 0");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if ((stateJoy || stateMeditate) && joyHoldExtra && p.needs.comfort.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && joyHoldExtra && (p.needs.comfort?.GUIChangeArrow > 0))
                 {
                     doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && joyHoldExtra && p.needs.comfort.GUIChangeArrow > 0");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if ((stateJoy || stateMeditate) && p.needs.mood.GUIChangeArrow > 0)
+                else if ((stateJoy || stateMeditate) && (p.needs.mood?.GUIChangeArrow > 0))
                 {
                     doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && p.needs.mood.GUIChangeArrow > 0");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if ((stateJoy || stateMeditate) && p.needs.mood.CurLevel < MINOR_BREAK)
+                else if ((stateJoy || stateMeditate) && mood < MINOR_BREAK)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "(stateJoy || stateMeditate) && p.needs.mood.CurLevel < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
@@ -809,7 +841,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (doubleEat && p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork && hasFood)
+                else if (doubleEat &&joy > 0.80f && rest > 0.80f && shouldEatBeforeWork && hasFood)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "doubleEat && p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork && hasFood");
                     setPawnState(p, PawnState.ANYTHING);
