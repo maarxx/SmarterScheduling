@@ -841,7 +841,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (doubleEat &&joy > 0.80f && rest > 0.80f && shouldEatBeforeWork && hasFood)
+                else if (doubleEat && joy > 0.80f && rest > 0.80f && shouldEatBeforeWork && hasFood)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "doubleEat && p.needs.joy.CurLevel > 0.80f && p.needs.rest.CurLevel > 0.80f && shouldEatBeforeWork && hasFood");
                     setPawnState(p, PawnState.ANYTHING);
