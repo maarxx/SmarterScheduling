@@ -698,7 +698,7 @@ namespace SmarterScheduling
 
                     doctorSubroutine(p, firstAwaiting);
                 }
-                else if (party)
+                else if (party && !p.IsSlave)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "party");
                     setPawnState(p, PawnState.ANYTHING);
