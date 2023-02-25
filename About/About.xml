@@ -7,6 +7,7 @@
   <packageId>maarx.smarterscheduling</packageId>
   <supportedVersions>
     <li>1.2</li>
+    <li>1.4</li>
   </supportedVersions>
   <modDependencies>
     <li>
