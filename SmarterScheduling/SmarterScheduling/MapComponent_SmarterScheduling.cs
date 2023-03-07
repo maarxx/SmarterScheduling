@@ -600,8 +600,8 @@ namespace SmarterScheduling
                 try
                 {
                     rest = (float)p.needs.rest?.CurLevel;
-                    joy = (float)p.needs.joy?.CurLevel;
                     mood = (float)p.needs.mood?.CurLevel;
+                    joy = (p.needs?.joy?.CurLevel ?? p.needs?.learning?.CurLevel) ?? 1.0f;
                 }
                 catch (Exception) {
                     // Do nothing, like for androids.
