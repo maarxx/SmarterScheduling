@@ -112,6 +112,16 @@ namespace SmarterScheduling
                 }
             }
         }
+        
+        public void initializeMapData()
+        {
+            initPlayerAreas(out this.recreation, RECREATION_NAME);
+            if (manageMeditation)
+            {
+                initPlayerAreas(out this.meditation, MEDIDATION_NAME);
+            }
+            initPawnsIntoCollection();
+        }
 
         public void initPlayerAreas(out Area savedArea, String areaName)
         {
@@ -359,9 +369,7 @@ namespace SmarterScheduling
 
         public void resetSelectedPawnsSchedules(PawnState state)
         {
-            initPlayerAreas(out this.recreation, RECREATION_NAME);
-            initPlayerAreas(out this.meditation, MEDIDATION_NAME);
-            initPawnsIntoCollection();
+            initializeMapData();
             foreach (object obj in Find.Selector.SelectedObjects)
             {
                 if (obj is Pawn)
@@ -374,9 +382,7 @@ namespace SmarterScheduling
 
         public void resetSelectedPawnsScheduleTypes(ScheduleType type)
         {
-            initPlayerAreas(out this.recreation, RECREATION_NAME);
-            initPlayerAreas(out this.meditation, MEDIDATION_NAME);
-            initPawnsIntoCollection();
+            initializeMapData();
             foreach (object obj in Find.Selector.SelectedObjects)
             {
                 if (obj is Pawn)
@@ -531,9 +537,7 @@ namespace SmarterScheduling
                 slowDown = 0;
             }
 
-            initPlayerAreas(out this.recreation, RECREATION_NAME);
-            initPlayerAreas(out this.meditation, MEDIDATION_NAME);
-            initPawnsIntoCollection();
+            initializeMapData();
 
             bool party = isThereAParty();
 
