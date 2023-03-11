@@ -90,10 +90,37 @@ namespace SmarterScheduling
             buttons.Add(new ModButton_Text(
                 delegate
                 {
+                    return "Reset All Selected" + Environment.NewLine + "Pawn's Schedule Types to ...";
+                },
+                delegate {
+                    Find.WindowStack.Add(new FloatMenu(menuResetAllScheduleTypes));
+                }
+            ));
+            buttons.Add(new ModButton_Text(
+                delegate
+                {
                     return "Reset All Selected" + Environment.NewLine + "Pawn's Schedules to ...";
                 },
                 delegate {
                     Find.WindowStack.Add(new FloatMenu(menuResetAllSchedules));
+                }
+            ));
+            buttons.Add(new ModButton_Text(
+                delegate
+                {
+                    string buttonLabel = "Children should:" + Environment.NewLine;
+                    if (getComponent().childLabor)
+                    {
+                        buttonLabel += "Learn then Work";
+                    }
+                    else
+                    {
+                        buttonLabel += "Only Learn";
+                    }
+                    return buttonLabel;
+                },
+                delegate {
+                    getComponent().childLabor = !getComponent().childLabor;
                 }
             ));
             buttons.Add(new ModButton_Text(
@@ -126,28 +153,19 @@ namespace SmarterScheduling
             buttons.Add(new ModButton_Text(
                 delegate
                 {
-                    string buttonLabel = "Children should:" + Environment.NewLine;
-                    if (getComponent().childLabor)
+                    string buttonLabel = "Joy Hold Extra is:" + Environment.NewLine;
+                    if (getComponent().joyHoldExtra)
                     {
-                        buttonLabel += "Learn then Work";
+                        buttonLabel += "Enabled";
                     }
                     else
                     {
-                        buttonLabel += "Only Learn";
+                        buttonLabel += "Disabled";
                     }
                     return buttonLabel;
                 },
                 delegate {
-                    getComponent().childLabor = !getComponent().childLabor;
-                }
-            ));
-            buttons.Add(new ModButton_Text(
-                delegate
-                {
-                    return "Reset All Selected" + Environment.NewLine + "Pawn's Schedule Types to ...";
-                },
-                delegate {
-                    Find.WindowStack.Add(new FloatMenu(menuResetAllScheduleTypes));
+                    getComponent().joyHoldExtra = !getComponent().joyHoldExtra;
                 }
             ));
             buttons.Add(new ModButton_Text(
@@ -202,24 +220,6 @@ namespace SmarterScheduling
                 },
                 delegate {
                     getComponent().manageMeditation = !getComponent().manageMeditation;
-                }
-            ));
-            buttons.Add(new ModButton_Text(
-                delegate
-                {
-                    string buttonLabel = "Joy Hold Extra is:" + Environment.NewLine;
-                    if (getComponent().joyHoldExtra)
-                    {
-                        buttonLabel += "Enabled";
-                    }
-                    else
-                    {
-                        buttonLabel += "Disabled";
-                    }
-                    return buttonLabel;
-                },
-                delegate {
-                    getComponent().joyHoldExtra = !getComponent().joyHoldExtra;
                 }
             ));
             buttons.Add(new ModButton_Text(
