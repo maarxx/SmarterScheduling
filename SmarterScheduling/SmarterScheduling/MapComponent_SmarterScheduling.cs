@@ -59,6 +59,8 @@ namespace SmarterScheduling
         public ImmuneSensitivity immuneSensitivity;
         public bool spoonFeeding;
 
+        public bool childLabor;
+
         public bool doubleSleep;
         public bool doubleEat;
 
@@ -86,6 +88,8 @@ namespace SmarterScheduling
             apparelCheckerInstance = new JobGiver_OptimizeApparel();
             apparelCheckerMethod = apparelCheckerInstance.GetType().
                 GetMethod("TryGiveJob", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            this.childLabor = false;
 
             this.doubleSleep = false;
             this.doubleEat = false;
@@ -597,18 +601,18 @@ namespace SmarterScheduling
                     // Do nothing, like with androids.
                 }
 
-                float rest = 1.0f;
-                float joy = 1.0f;
-                float mood = 1.0f;
-
-                try
+                float rest = p.needs?.rest?.CurLevel ?? 1.0f;
+                float mood = p.needs?.mood?.CurLevel ?? 1.0f;
+                bool isChild = false;
+                float joy;
+                if (p.needs?.learning?.def != null)
                 {
-                    rest = (float)p.needs.rest?.CurLevel;
-                    mood = (float)p.needs.mood?.CurLevel;
-                    joy = (p.needs?.joy?.CurLevel ?? p.needs?.learning?.CurLevel) ?? 1.0f;
+                    isChild = true;
+                    joy = p.needs.learning.CurLevel;
                 }
-                catch (Exception) {
-                    // Do nothing, like for androids.
+                else
+                {
+                    joy = p.needs?.joy?.CurLevel ?? 1.0f;
                 }
 
                 object changeClothesJob = apparelCheckerMethod.Invoke(apparelCheckerInstance, new object[] { p });
@@ -840,9 +844,19 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && canSleep");
                     setPawnState(p, PawnState.SLEEP);
                 }
+                else if (!childLabor && isChild && canSleep)
+                {
+                    doLogging(p.Name.ToStringShort + ": " + "!childLabor && isChild && canSleep");
+                    setPawnState(p, PawnState.SLEEP);
+                }
                 else if (pawnSchedule == ScheduleType.MAXMOOD)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD");
+                    setPawnState(p, PawnState.JOY);
+                }
+                else if (!childLabor && isChild)
+                {
+                    doLogging(p.Name.ToStringShort + ": " + "!childLabor && isChild");
                     setPawnState(p, PawnState.JOY);
                 }
                 else if (doubleEat && joy > 0.80f && rest > 0.80f && shouldEatBeforeWork && hasFood)

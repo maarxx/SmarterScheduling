@@ -126,6 +126,24 @@ namespace SmarterScheduling
             buttons.Add(new ModButton_Text(
                 delegate
                 {
+                    string buttonLabel = "Children should:" + Environment.NewLine;
+                    if (getComponent().childLabor)
+                    {
+                        buttonLabel += "Learn then Work";
+                    }
+                    else
+                    {
+                        buttonLabel += "Only Learn";
+                    }
+                    return buttonLabel;
+                },
+                delegate {
+                    getComponent().childLabor = !getComponent().childLabor;
+                }
+            ));
+            buttons.Add(new ModButton_Text(
+                delegate
+                {
                     return "Reset All Selected" + Environment.NewLine + "Pawn's Schedule Types to ...";
                 },
                 delegate {
