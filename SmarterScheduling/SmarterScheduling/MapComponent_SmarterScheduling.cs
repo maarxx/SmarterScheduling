@@ -581,7 +581,7 @@ namespace SmarterScheduling
 
                 bool layingDown = (p.CurJob.def.reportString == "lying down.");
                 bool sleeping = (p.needs.rest?.GUIChangeArrow > 0) || false;
-                bool justWokeRested = !sleeping && (p.needs.rest?.CurLevel > 0.95f) || false;
+                bool justWokeRested = !sleeping && (p.needs.rest?.CurLevel > 0.98f) || false;
 
                 bool hungry = false;
                 bool shouldEatBeforeWork = false;
