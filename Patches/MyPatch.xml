@@ -1,0 +1,25 @@
+<!-- Add /comps/li/compClass if there are no comps yet. -->
+<!-- Add /li/compClass to /comps if exists (i.e. other mod already added the comps field first) -->
+<Patch>
+  <Operation Class="PatchOperationConditional">
+      <xpath>/Defs/ThingDef[defName="Human"]/comps</xpath>
+      <nomatch Class="PatchOperationAdd">
+          <xpath>/Defs/ThingDef[defName="Human"]</xpath>
+          <value>
+              <comps>
+                  <li>
+                      <compClass>SmarterScheduling.ThingComp_SmarterScheduling</compClass>
+                  </li>
+              </comps>
+          </value>
+      </nomatch>
+      <match Class="PatchOperationAdd">
+          <xpath>/Defs/ThingDef[defName="Human"]/comps</xpath>
+          <value>
+              <li>
+                  <compClass>SmarterScheduling.ThingComp_SmarterScheduling</compClass>
+              </li>
+          </value>
+      </match>
+  </Operation>
+</Patch>

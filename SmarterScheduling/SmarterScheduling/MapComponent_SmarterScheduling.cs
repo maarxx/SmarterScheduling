@@ -19,35 +19,10 @@ namespace SmarterScheduling
             }
         }
 
-        public enum PawnState
-        {
-            SLEEP,
-            JOY,
-            WORK,
-            MEDITATE,
-            ANYTHING
-        }
-
-        public enum ImmuneSensitivity
-        {
-            SENSITIVE,
-            BALANCED,
-            BRUTAL
-        }
-
-        public enum ScheduleType
-        {
-            WORK,
-            MAXMOOD
-        }
-
         public const string RECREATION_NAME = "Joy";
         public const string MEDIDATION_NAME = "Medi";
 
-        public Dictionary<Pawn, PawnState> pawnStates;
-        public Dictionary<Pawn, ScheduleType> pawnSchedules;
         public Dictionary<Pawn, bool> shouldResetPawnOnHungry;
-        public Dictionary<Pawn, Area> lastPawnAreas;
         public Dictionary<Pawn, int> doctorResetTick;
 
         public Area recreation;
@@ -75,10 +50,7 @@ namespace SmarterScheduling
 
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
-            this.pawnStates = new Dictionary<Pawn, PawnState>();
-            this.pawnSchedules = new Dictionary<Pawn, ScheduleType>();
             this.shouldResetPawnOnHungry = new Dictionary<Pawn, bool>();
-            this.lastPawnAreas = new Dictionary<Pawn, Area>();
             this.doctorResetTick = new Dictionary<Pawn, int>();
 
             this.enabled = false;
@@ -157,26 +129,16 @@ namespace SmarterScheduling
         {
             foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)
             {
-                if (!lastPawnAreas.ContainsKey(p))
-                {
-                    lastPawnAreas.Add(p, null);
-                }
-                Area curPawnArea = p.playerSettings.AreaRestriction;
-                if (curPawnArea == null || (curPawnArea != recreation && curPawnArea != meditation))
-                {
-                    lastPawnAreas[p] = curPawnArea;
-                }
-                if (!pawnStates.ContainsKey(p))
-                {
-                    pawnStates.Add(p, PawnState.ANYTHING);
-                }
-                if (!pawnSchedules.ContainsKey(p))
-                {
-                    pawnSchedules.Add(p, ScheduleType.WORK);
-                }
                 if (!shouldResetPawnOnHungry.ContainsKey(p))
                 {
                     shouldResetPawnOnHungry.Add(p, true);
+                }
+                ThingComp_SmarterScheduling comp = p.TryGetComp<ThingComp_SmarterScheduling>();
+                Area curArea = p.playerSettings.AreaRestriction;
+                String curAreaName = curArea.ToString();
+                if (curAreaName != RECREATION_NAME && curAreaName != MEDIDATION_NAME)
+                {
+                    p.TryGetComp<ThingComp_SmarterScheduling>().area = curArea;
                 }
             }
         }
@@ -392,14 +354,14 @@ namespace SmarterScheduling
                 if (obj is Pawn)
                 {
                     Pawn p = (Pawn)obj;
-                    pawnSchedules.SetOrAdd(p, type);
+                    p.TryGetComp<ThingComp_SmarterScheduling>().scheduleType = type;
                 }
             }
         }
 
         public void setPawnState(Pawn p, PawnState state, bool doRestriction = true)
         {
-            pawnStates[p] = state;
+            p.TryGetComp<ThingComp_SmarterScheduling>().pawnState = state;
 
             if (doRestriction)
             {
@@ -458,7 +420,7 @@ namespace SmarterScheduling
 
         public void considerReleasingPawn(Pawn p)
         {
-            p.playerSettings.AreaRestriction = this.lastPawnAreas[p];
+            p.playerSettings.AreaRestriction = p.TryGetComp<ThingComp_SmarterScheduling>().area;
         }
 
         public void updateDoctorResetTickCollection(Pawn p, bool isDoctor)
@@ -620,12 +582,13 @@ namespace SmarterScheduling
 
                 bool canSleep = (rest < 0.74f);
 
-                ScheduleType pawnSchedule = pawnSchedules.TryGetValue(p, ScheduleType.WORK);
+                ScheduleType pawnSchedule = p.TryGetComp<ThingComp_SmarterScheduling>().scheduleType;
+                PawnState pawnState = p.TryGetComp<ThingComp_SmarterScheduling>().pawnState;
 
-                bool stateSleep = (pawnStates[p] == PawnState.SLEEP);
-                bool stateJoy = (pawnStates[p] == PawnState.JOY);
-                bool stateWork = (pawnStates[p] == PawnState.WORK);
-                bool stateMeditate = (pawnStates[p] == PawnState.MEDITATE);
+                bool stateSleep = (pawnState == PawnState.SLEEP);
+                bool stateJoy = (pawnState == PawnState.JOY);
+                bool stateWork = (pawnState == PawnState.WORK);
+                bool stateMeditate = (pawnState == PawnState.MEDITATE);
 
                 bool shouldMeditate = p.HasPsylink && p.psychicEntropy.CurrentPsyfocus < p.psychicEntropy.TargetPsyfocus;
 
@@ -884,7 +847,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "layingDown && !sleeping && !needsTreatment");
                     if (!(gainingImmunity && immuneSensitivity == ImmuneSensitivity.SENSITIVE))
                     {
-                        if (pawnStates[p] == PawnState.JOY)
+                        if (stateJoy)
                         {
                             //tryToResetPawn(p);
                         }

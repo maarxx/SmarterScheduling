@@ -19,13 +19,13 @@ namespace SmarterScheduling
         }
         public override AlertReport GetReport()
         {
-            Dictionary<Pawn, ScheduleType> schedules = Find.CurrentMap.GetComponent<MapComponent_SmarterScheduling>().pawnSchedules;
             List<Pawn> affectedPawns = new List<Pawn>();
-            foreach (KeyValuePair<Pawn, ScheduleType> kv in schedules)
+            foreach (Pawn p in Find.CurrentMap.mapPawns.FreeColonistsSpawned)
             {
-                if (kv.Value == ScheduleType.MAXMOOD)
+                ScheduleType scheduleType = p.TryGetComp<ThingComp_SmarterScheduling>().scheduleType;
+                if (scheduleType == ScheduleType.MAXMOOD)
                 {
-                    affectedPawns.Add(kv.Key);
+                    affectedPawns.Add(p);
                 }
             }
             if (affectedPawns.Count > 0)
