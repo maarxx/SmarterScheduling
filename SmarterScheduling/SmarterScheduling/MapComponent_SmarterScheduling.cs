@@ -584,7 +584,7 @@ namespace SmarterScheduling
 
                 bool canSleep = (rest < 0.74f);
 
-                ScheduleType pawnSchedule = p.TryGetComp<ThingComp_SmarterScheduling>().scheduleType;
+                ScheduleType scheduleType = p.TryGetComp<ThingComp_SmarterScheduling>().scheduleType;
                 PawnState pawnState = p.TryGetComp<ThingComp_SmarterScheduling>().pawnState;
 
                 bool stateSleep = (pawnState == PawnState.SLEEP);
@@ -725,7 +725,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "p.needs.joy.CurLevel < 0.30f");
                     setPawnState(p, PawnState.JOY);
                 }
-                else if (pawnSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK)
+                else if (scheduleType == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && p.needs.mood.CurLevel < MINOR_BREAK");
                     setPawnState(p, PawnState.JOY);
@@ -804,7 +804,7 @@ namespace SmarterScheduling
                         setPawnState(p, PawnState.JOY);
                     }
                 }
-                else if (pawnSchedule == ScheduleType.MAXMOOD && canSleep)
+                else if (scheduleType == ScheduleType.MAXMOOD && canSleep)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD && canSleep");
                     setPawnState(p, PawnState.SLEEP);
@@ -814,7 +814,7 @@ namespace SmarterScheduling
                     doLogging(p.Name.ToStringShort + ": " + "!childLabor && isChild && canSleep");
                     setPawnState(p, PawnState.SLEEP);
                 }
-                else if (pawnSchedule == ScheduleType.MAXMOOD)
+                else if (scheduleType == ScheduleType.MAXMOOD)
                 {
                     doLogging(p.Name.ToStringShort + ": " + "curSchedule == ScheduleType.MAXMOOD");
                     setPawnState(p, PawnState.JOY);
