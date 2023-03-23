@@ -18,13 +18,16 @@ namespace SmarterScheduling
 
         public override void PostExposeData()
         {
-            Scribe_Values.Look(ref area, "normalArea", null);
+            Scribe_Values.Look(ref pawnState, "pawnState");
+            Scribe_Values.Look(ref scheduleType, "scheduleType");
+            Scribe_Values.Look(ref area, "normalArea");
         }
 
         public virtual void ExposeData()
         {
-            Scribe_Values.Look(ref area, "normalArea", null);
-
+            Scribe_Values.Look(ref pawnState, "pawnState");
+            Scribe_Values.Look(ref scheduleType, "scheduleType");
+            Scribe_Values.Look(ref area, "normalArea");
         }
 
         // Hoisted from:
