@@ -135,7 +135,7 @@ namespace SmarterScheduling
                 }
                 ThingComp_SmarterScheduling comp = p.TryGetComp<ThingComp_SmarterScheduling>();
                 Area curArea = p.playerSettings.AreaRestriction;
-                String curAreaName = curArea.ToString();
+                String curAreaName = curArea?.ToString();
                 if (curAreaName != RECREATION_NAME && curAreaName != MEDIDATION_NAME)
                 {
                     p.TryGetComp<ThingComp_SmarterScheduling>().area = curArea;
