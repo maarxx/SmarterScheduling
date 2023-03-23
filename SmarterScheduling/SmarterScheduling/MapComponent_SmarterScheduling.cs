@@ -138,7 +138,7 @@ namespace SmarterScheduling
                 String curAreaName = curArea?.ToString();
                 if (curAreaName != RECREATION_NAME && curAreaName != MEDIDATION_NAME)
                 {
-                    p.TryGetComp<ThingComp_SmarterScheduling>().area = curArea;
+                    comp.area = curArea;
                 }
             }
         }
