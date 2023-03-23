@@ -20,14 +20,14 @@ namespace SmarterScheduling
         {
             Scribe_Values.Look(ref pawnState, "pawnState");
             Scribe_Values.Look(ref scheduleType, "scheduleType");
-            Scribe_Values.Look(ref area, "normalArea");
+            Scribe_References.Look(ref area, "normalArea");
         }
 
         public virtual void ExposeData()
         {
             Scribe_Values.Look(ref pawnState, "pawnState");
             Scribe_Values.Look(ref scheduleType, "scheduleType");
-            Scribe_Values.Look(ref area, "normalArea");
+            Scribe_References.Look(ref area, "normalArea");
         }
 
         // Hoisted from:
