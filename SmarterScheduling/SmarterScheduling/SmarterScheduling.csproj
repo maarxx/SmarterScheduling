@@ -37,6 +37,8 @@
   <ItemGroup>
     <Compile Include="Alert_PawnsMaxMood.cs" />
     <Compile Include="Alert_SwitchedOff.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="ThingComp_SmarterScheduling.cs" />
     <Compile Include="SmarterScheduling_RegisterToMainTab.cs" />
     <Compile Include="MapComponent_SmarterScheduling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

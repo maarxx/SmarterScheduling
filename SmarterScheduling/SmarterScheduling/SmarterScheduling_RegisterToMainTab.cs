@@ -50,19 +50,19 @@ namespace SmarterScheduling
             List<List<ModButton_Text>> columns = MainTabWindow_ModButtons.columns;
 
             List<FloatMenuOption> menuImmuneSensitivty = new List<FloatMenuOption>();
-            foreach (MapComponent_SmarterScheduling.ImmuneSensitivity immSen in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ImmuneSensitivity)))
+            foreach (ImmuneSensitivity immSen in Enum.GetValues(typeof(ImmuneSensitivity)))
             {
                 menuImmuneSensitivty.Add(new FloatMenuOption(immSen.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().immuneSensitivity = immSen; }));
             }
 
             List<FloatMenuOption> menuResetAllSchedules = new List<FloatMenuOption>();
-            foreach (MapComponent_SmarterScheduling.PawnState pawnState in Enum.GetValues(typeof(MapComponent_SmarterScheduling.PawnState)))
+            foreach (PawnState pawnState in Enum.GetValues(typeof(PawnState)))
             {
                 menuResetAllSchedules.Add(new FloatMenuOption(pawnState.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().resetSelectedPawnsSchedules(pawnState); }));
             }
 
             List<FloatMenuOption> menuResetAllScheduleTypes = new List<FloatMenuOption>();
-            foreach (MapComponent_SmarterScheduling.ScheduleType scheduleType in Enum.GetValues(typeof(MapComponent_SmarterScheduling.ScheduleType)))
+            foreach (ScheduleType scheduleType in Enum.GetValues(typeof(ScheduleType)))
             {
                 menuResetAllScheduleTypes.Add(new FloatMenuOption(scheduleType.ToString().ToLower().CapitalizeFirst(), delegate { getComponent().resetSelectedPawnsScheduleTypes(scheduleType); }));
             }
