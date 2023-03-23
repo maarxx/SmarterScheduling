@@ -19,6 +19,9 @@ namespace SmarterScheduling
             }
         }
 
+        public int slowDown;
+        public bool enableLogging;
+
         public const string RECREATION_NAME = "Joy";
         public const string MEDIDATION_NAME = "Medi";
 
@@ -28,54 +31,55 @@ namespace SmarterScheduling
         public Area recreation;
         public Area meditation;
 
-        public int slowDown;
-
         public bool enabled;
         public ImmuneSensitivity immuneSensitivity;
         public bool spoonFeeding;
-
         public bool childLabor;
-
         public bool doubleSleep;
         public bool doubleEat;
-
         public bool manageMeditation;
-
         public bool joyHoldExtra;
 
         public static JobGiver_OptimizeApparel apparelCheckerInstance;
         public static MethodInfo apparelCheckerMethod;
-
-        public bool enableLogging;
 
         public MapComponent_SmarterScheduling(Map map) : base(map)
         {
             this.shouldResetPawnOnHungry = new Dictionary<Pawn, bool>();
             this.doctorResetTick = new Dictionary<Pawn, int>();
 
-            this.enabled = false;
-            this.immuneSensitivity = ImmuneSensitivity.SENSITIVE;
-            this.spoonFeeding = true;
-
             apparelCheckerInstance = new JobGiver_OptimizeApparel();
             apparelCheckerMethod = apparelCheckerInstance.GetType().
                 GetMethod("TryGiveJob", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            this.childLabor = false;
-
-            this.doubleSleep = false;
-            this.doubleEat = false;
-
-            this.manageMeditation = false;
-
-            this.joyHoldExtra = false;
-
-            this.enableLogging = false;
 
             this.slowDown = 0;
             //initPlayerAreas();
             //initPawnsIntoCollection();
             LongEventHandler.QueueLongEvent(ensureComponentExists, null, false, null);
+        }
+
+        public virtual void PostExposeData()
+        {
+            Scribe_Values.Look(ref enabled, "enabled");
+            Scribe_Values.Look(ref immuneSensitivity, "immuneSensitivity");
+            Scribe_Values.Look(ref spoonFeeding, "spoonFeeding", true);
+            Scribe_Values.Look(ref childLabor, "childLabor");
+            Scribe_Values.Look(ref doubleSleep, "doubleSleep");
+            Scribe_Values.Look(ref doubleEat, "doubleEat");
+            Scribe_Values.Look(ref manageMeditation, "manageMeditation");
+            Scribe_Values.Look(ref joyHoldExtra, "joyHoldExtra");
+        }
+
+        public override void ExposeData()
+        {
+            Scribe_Values.Look(ref enabled, "enabled");
+            Scribe_Values.Look(ref immuneSensitivity, "immuneSensitivity");
+            Scribe_Values.Look(ref spoonFeeding, "spoonFeeding", true);
+            Scribe_Values.Look(ref childLabor, "childLabor");
+            Scribe_Values.Look(ref doubleSleep, "doubleSleep");
+            Scribe_Values.Look(ref doubleEat, "doubleEat");
+            Scribe_Values.Look(ref manageMeditation, "manageMeditation");
+            Scribe_Values.Look(ref joyHoldExtra, "joyHoldExtra");
         }
 
         public static void ensureComponentExists()
