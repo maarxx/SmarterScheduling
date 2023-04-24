@@ -12,12 +12,12 @@ This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModBut
 
 # Table of Contents
 
-* [Basic Explanation](#basic-explanation)
 * [Introduction](#introduction)
+* [Explanation](#explanation)
 * [Specific Additional Features](#specific-additional-features)
 * [Advanced Details](#advanced-details)
 
-# Basic Explanation
+# Introduction
 
 The mod provides an entirely different/automated handling of pawn Sleep/Recreation/Work cycles, without those little colored squares in the grid.
 
@@ -27,7 +27,7 @@ You need to manually turn it on (with the topmost button), and then it will auto
 
 With this mod running, the classic Schedule tab's little colored grid of squares isn't usable anymore. You can put anything you want there, but the mod will ignore it, and overwrite it every few seconds. You can, however, watch the rows change color as your pawns go through their cycle.
 
-# Introduction
+# Explanation
 
 #### Okay, let's be honest. We all want the same thing.
 
