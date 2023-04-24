@@ -2,7 +2,7 @@
 
 This is a mod for the game RimWorld by Ludeon Studios.
 
-It automatically manages your Pawn's Sleep, Recreation, and Work cycles.
+The mod provides an entirely different/automated handling of pawn Sleep/Recreation/Work cycles, without those little colored squares in the grid.
 
 We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324536212
 
@@ -12,10 +12,20 @@ This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModBut
 
 # Table of Contents
 
-* [Introduction](#introduction)
 * [Basic Explanation](#basic-explanation)
+* [Introduction](#introduction)
 * [Specific Additional Features](#specific-additional-features)
 * [Advanced Details](#advanced-details)
+
+# Basic Explanation
+
+The mod provides an entirely different/automated handling of pawn Sleep/Recreation/Work cycles, without those little colored squares in the grid.
+
+The dependency "ModButtons" will add a similarly-named tab in the bottom-right corner, with some control buttons.
+
+You need to manually turn it on (with the topmost button), and then it will automatically manage your pawn's Sleep/Recreation/Work cycles.
+
+With this mod running, the classic Schedule tab's little colored grid of squares isn't usable anymore. You can put anything you want there, but the mod will ignore it, and overwrite it every few seconds. You can, however, watch the rows change color as your pawns go through their cycle.
 
 # Introduction
 
@@ -42,18 +52,6 @@ Whenever something happens to offset the schedule (like an emergency or combat),
 #### Enter Smarter Scheduling
 
 This mod implements exactly that behavior we all want. Automatically.
-
-# Basic Explanation
-
-You'll add the mod. You'll enable the mod. By default, it won't do anything. That's okay.
-
-The dependency "ModButtons" will add a similarly-named tab in the bottom-right corner, with some control buttons.
-
-You'll probably want to turn this one ON for most of the time. You might turn it OFF during real emergencies, but then you'll probably turn it back ON after the crisis has been addressed.
-
-It will default back to OFF when you Save/Load, so remember to turn it back ON each time.
-
-While it is ON, the mod will automatically manage each pawn's Sleep / Recreation / Work schedules. You can open the Schedule tab and watch it work.
 
 The mod doesn't care what time it is, and doesn't worry about future scheduling -- it updates each pawn's whole schedule block to one uniform task/color, and then constantly changes it on the fly.
 
