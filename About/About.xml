@@ -3,7 +3,15 @@
   <name>SmarterScheduling</name>
   <author>Maarx</author>
   <url>https://github.com/maarxx/SmarterScheduling/</url>
-  <description>Automatically manages your Pawn's Sleep, Recreation, and Work cycles.</description>
+  <description>
+The mod provides an entirely different/automated handling of pawn Sleep/Recreation/Work cycles, without those little colored squares in the grid.
+
+The dependency "ModButtons" will add a similarly-named tab in the bottom-right corner, with some control buttons.
+
+You need to manually turn it on (with the topmost button), and then it will automatically manage your pawn's Sleep/Recreation/Work cycles.
+
+With this mod running, the classic Schedule tab's little colored grid of squares isn't usable anymore. You can put anything you want there, but the mod will ignore it, and overwrite it every few seconds. You can, however, watch the rows change color as your pawns go through their cycle.
+  </description>
   <packageId>maarx.smarterscheduling</packageId>
   <supportedVersions>
     <li>1.2</li>
