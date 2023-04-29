@@ -4,8 +4,6 @@ This is a mod for the game RimWorld by Ludeon Studios.
 
 The mod provides an entirely different/automated handling of pawn Sleep/Recreation/Work cycles, without those little colored squares in the grid.
 
-We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324536212
-
 # Dependency
 
 This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModButtons)
@@ -13,6 +11,7 @@ This requires another mod of mine: [ModButtons](https://github.com/maarxx/ModBut
 # Table of Contents
 
 * [Introduction](#introduction)
+* [Links](#links)
 * [Explanation](#explanation)
 * [Specific Additional Features](#specific-additional-features)
 * [Advanced Details](#advanced-details)
@@ -26,6 +25,14 @@ The dependency "ModButtons" will add a similarly-named tab in the bottom-right c
 You need to manually turn it on (with the topmost button), and then it will automatically manage your pawn's Sleep/Recreation/Work cycles.
 
 With this mod running, the classic Schedule tab's little colored grid of squares isn't usable anymore. You can put anything you want there, but the mod will ignore it, and overwrite it every few seconds. You can, however, watch the rows change color as your pawns go through their cycle.
+
+# Links
+
+We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324536212
+
+We're on GitHub: https://github.com/maarxx/SmarterScheduling
+
+For reporting bugs or requesting features, Github Issues are better than Steam Workshop Comments.
 
 # Explanation
 
